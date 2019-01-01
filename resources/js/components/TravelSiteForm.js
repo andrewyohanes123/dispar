@@ -11,7 +11,7 @@ export class TravelSiteForm extends Component {
       name : "",
       address : "",
       travel_type_id : '',
-      photo : '',
+      photo : [],
       description : '',
       latitude : 0,
       longitude : 0,
@@ -20,6 +20,7 @@ export class TravelSiteForm extends Component {
 
     this.getTypes = this.getTypes.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.onFileSelected = this.onFileSelected.bind(this);
   }
 
   getTypes() {
@@ -35,6 +36,12 @@ export class TravelSiteForm extends Component {
   onChange(ev) {
     this.setState({
       [ev.target.name] : ev.target.value
+    })
+  }
+
+  onFileSelected(ev) {
+    this.setState({
+      photo : ev.target.files
     })
   }
 
@@ -55,7 +62,7 @@ export class TravelSiteForm extends Component {
                 { this.state.types.map((type, i) => (<option key={i} value={type.id}>{type.name}</option>)) }
               </select>
               <label htmlFor="" className="control-label mb-1 mt-1">Gambar tempat wisata</label>
-              <input type="file" name="photo[]" onChange={this.onChange} value={this.state.photo} multiple={true} accept="image/*" className="form-control" id="" />
+              <input type="file" name="photo" onChange={this.onFileSelected} multiple={true} accept="image/*" className="form-control" id="" />
               <label htmlFor="" className="control-label mb-1 mt-1">Deskripsi tempat wisata</label>
               <textarea name="description" onChange={this.onChange} value={description} rows="5" placeholder="Deskripsi" className="form-control" />
               <hr />

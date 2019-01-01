@@ -66874,7 +66874,7 @@ function (_Component) {
       name: "",
       address: "",
       travel_type_id: '',
-      photo: '',
+      photo: [],
       description: '',
       latitude: 0,
       longitude: 0,
@@ -66882,6 +66882,7 @@ function (_Component) {
     };
     _this.getTypes = _this.getTypes.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.onFileSelected = _this.onFileSelected.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
@@ -66905,6 +66906,13 @@ function (_Component) {
     key: "onChange",
     value: function onChange(ev) {
       this.setState(_defineProperty({}, ev.target.name, ev.target.value));
+    }
+  }, {
+    key: "onFileSelected",
+    value: function onFileSelected(ev) {
+      this.setState({
+        photo: ev.target.files
+      });
     }
   }, {
     key: "render",
@@ -66965,9 +66973,8 @@ function (_Component) {
         className: "control-label mb-1 mt-1"
       }, "Gambar tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "file",
-        name: "photo[]",
-        onChange: this.onChange,
-        value: this.state.photo,
+        name: "photo",
+        onChange: this.onFileSelected,
         multiple: true,
         accept: "image/*",
         className: "form-control",
@@ -67027,8 +67034,8 @@ if (document.getElementById('travel-form')) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Applications/XAMPP/xamppfiles/htdocs/dispar/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Applications/XAMPP/xamppfiles/htdocs/dispar/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp\htdocs\dispar\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\dispar\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
