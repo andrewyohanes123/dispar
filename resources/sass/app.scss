@@ -1,0 +1,60 @@
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+// .icons {
+//   background: rgba(255, 255, 255, 0.04);
+//   border-radius: 0.25em;
+//   font-size: 20px !important;
+// }
+
+.facebook-icon {
+  color : #3b5998;
+}
+
+.instagram-icon {
+  color : #517fa4;
+}
+
+.twitter-icon {
+  color: #55acee;
+}
+
+.youtube-icon {
+  color : #b31217;
+}
+
+.card-icon {
+  position: absolute;
+  top : 15px;
+  right : 15px;
+  transform: rotate(15deg) scale(4);
+}
+
+.o-hidden {
+  overflow: hidden;
+}
+
+.navbar-nav {
+  .nav-item {
+    padding: 0.5rem;
+  }
+  .active {
+    background: #6bace1;
+    // a {
+    //   color : rgb(85, 85, 85) !important;
+    // }
+  }
+  // }
+}
