@@ -15,7 +15,7 @@
         </div>
         <img src="{{ asset('storage/img/' . $news->hero_img ) }}" title="{{ $news->title }}" alt="" class="card-img">
         <div class="card-body text-justify">
-          <p>{{ $news->content }}</p>
+          <p>{!! $news->content !!}</p>
         </div>
       </div>
     </div>

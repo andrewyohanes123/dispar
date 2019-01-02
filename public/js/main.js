@@ -1,4 +1,8 @@
 $(document).ready(function () {
+  $('#news-content').summernote({
+    placeholder : 'Isi berita',
+    height : 200
+  });
   $('.load-more').click(function () {
     if (!$(this).hasClass('d-none')) {
       $(this).addClass('d-none');

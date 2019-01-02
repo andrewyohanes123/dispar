@@ -24,7 +24,7 @@
           </span>
       @endif
       <label for="" class="control-label mt-1 mb-1">Isi berita</label>
-      <textarea name="content" class="form-control {{ ($errors->has('content') ? 'is-invalid' : '') }}" id="" placeholder="Isi berita" rows="5"></textarea>
+      <textarea name="content" class="form-control {{ ($errors->has('content') ? 'is-invalid' : '') }}" id="news-content" placeholder="Isi berita" rows="5"></textarea>
       @if ($errors->has('content'))
           <span class="invalid-feedback">
             {{ $errors->first('content') }}

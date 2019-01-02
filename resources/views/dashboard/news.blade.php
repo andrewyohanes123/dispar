@@ -35,7 +35,7 @@
             <div class="card-body">
               <h4 class="m-0">{{ $item->title }}</h4>
               <p class="small text-muted">Di post oleh {{ $item->user->name }} pada {{ $item->created_at->format('d M Y') }}</p>
-              <p id="news{{ $item->id }}" class="m-0 text-truncate text-justify">{{ $item->content }}</p>
+              <div id="news{{ $item->id }}" class="m-0 text-truncate">{!! $item->content !!}</div>
               <hr>
               <a href="{{ route('berita.edit', ['id' => $item->id]) }}" title="Edit {{ $item->title }}" class="btn btn-warning btn-sm"><i class="fa fa-edit fa-lg"></i></a>
               <a href="{{ route('berita.destroy', ['id' => $item->id]) }}" title="Hapus {{ $item->title }}" data-id="{{ $item->id }}" class="btn btn-danger btn-sm hapus-berita"><i class="fa fa-remove fa-lg"></i></a>

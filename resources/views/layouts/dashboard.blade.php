@@ -10,6 +10,7 @@
   <link href="{{ asset('css/dark.css') }}" rel="stylesheet">
   <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
   <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ asset('css/summernote-bs4.css') }}" rel="stylesheet">
 </head>
 <body>
   <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
@@ -49,6 +50,7 @@
   </div>
   <script src="{{ mix('js/app.js') }}" defer></script>    
   <script src="{{ asset('js/flatpickr') }}"></script>  
+  <script src="{{ asset('js/summernote-bs4.js') }}" defer></script>    
   <script src="{{ asset('js/main.js') }}" defer></script>    
   {{-- @yield('scripts') --}}
 </body>
