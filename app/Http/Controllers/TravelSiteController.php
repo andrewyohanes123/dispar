@@ -41,6 +41,7 @@ class TravelSiteController extends Controller
      */
     public function store(Request $request)
     {
+        // return $request->file('photo');
         // dd($request->hasFile('photo'));
         $request->validate([
             'name' => 'required|min:4',
@@ -49,40 +50,51 @@ class TravelSiteController extends Controller
             'travel_type_id' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
-            'photo' => 'required|file|mimes:jpeg,jpg,png,gif|max:2048'
+            'photo' => 'required|file|mimes:jpeg,jpg,png'
+        ], [
+            'name.required' => 'Masukkan nama tempat wisata',
+            'name.min' => 'Nama tempat wisata harus lebih dari atau sama dengan 4 karakter',            
+            'address.required' => 'Masukkan alamat tempat wisata',
+            'address.min' => 'Alamat tempat wisata harus lebih dari atau sama dengan 4 karakter',            
+            'description.required' => 'Masukkan deskripsi tempat wisata',
+            'description.min' => 'Deskripsi tempat wisata harus lebih dari atau sama dengan 4 karakter',            
+            'travel_type_id.required' => 'Pilih tipe wisata',
+            'photo.required' => 'Masukkan gambar tempat wisata'
         ]);
 
-        $result = Site::create([
-            'name' => $request->name,
-            'slug' => str_slug(strtolower($request->name)),
-            'address' => $request->address,
-            'description' => $request->description,
-            'site_type_id' => 5,
-            'travel_type_id' => $request->travel_type_id,
-            'latitude' => 124.185,
-            'longitude' => 1.567
-        ]);
+        // $result = Site::create([
+        //     'name' => $request->name,
+        //     'slug' => str_slug(strtolower($request->name)),
+        //     'address' => $request->address,
+        //     'description' => $request->description,
+        //     'site_type_id' => 5,
+        //     'travel_type_id' => $request->travel_type_id,
+        //     'latitude' => $request->latitude,
+        //     'longitude' => $request->longitude
+        // ]);
 
-        if ($result) {
+        // if ($result) {
+            // return ['hasFile' => $request->hasFile('photo')];
+            return ['file' => $request->hasFile('photo')];
             if ($request->hasFile('photo'))
             {
                 $files = [];
-                foreach($request->photo as $i => $pic) {
-                    // var_dump($pic);
-                    $filenameWithExt = $pic->getClientOriginalName();
-                    $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                    $ext = $pic->getClientOriginalExtension();
-                    $file = $filename . "_" . time() . '.' . $ext;
-                    $path = $pic->storeAs('public/img',$file);
-                    $files[$i] = ['photo' => $file, 'site_id' => 1];
-                }
-                // return $files;
+                // return $request->file('photo');
+                // return $request->photo;
+                // foreach($request->photo as $i => $pic) {
+                //     // var_dump($pic);
+                //     $filenameWithExt = $pic->getClientOriginalName();
+                //     $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                //     $ext = $pic->getClientOriginalExtension();
+                //     $file = $filename . "_" . time() . '.' . $ext;
+                //     $path = $pic->storeAs('public/img',$file);
+                //     $files[$i] = ['photo' => $file, 'site_id' => $result->id];
+                // }
+                // SitePicture::create($files);
+                
             }
-
-            SitePicture::create($files);
-
-            return redirect()->route('tempat-wisata.index');
-        }
+            // return ['files' => $result];
+        // }
     }
 
     /**
