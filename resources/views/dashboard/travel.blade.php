@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 @section('title', 'Tempat wisata')
 @section('content')
-    <div class="d-flex flex-row justify-content-between align-items-center">
+    {{-- <div class="d-flex flex-row justify-content-between align-items-center">
       <h4 class="m-0"><i class="fa fa-map-marker fa-lg"></i>&nbsp;Tempat Wisata | <a href="{{ route('tempat-wisata.create') }}" class="btn btn-outline-success btn-sm"><i class="fa fa-plus-square fa-fw"></i>&nbsp;Tambah tempat wisata</a></h4>
       <form action="" method="get">
         <div class="input-group">
@@ -10,9 +10,10 @@
         </div>
       </form>
     </div>
-    <hr>
-    <div class="card-columns">
-        @foreach ($sites as $site)  
+    <hr> --}}
+    <div id="travel-site"></div>
+    {{-- <div class="card-columns"> --}}
+        {{-- @foreach ($sites as $site)  
         <div class="card">
           <img src="{{ asset('storage/img/' . $site->site_pictures->first()->photo) }}" alt="" class="card-img-top">
           <div class="card-body">
@@ -25,7 +26,7 @@
             <a href="#" class="btn btn-primary btn-sm" title="Preview {{ $site->name }}" ><i class="fa fa-eye fa-lg"></i></a>
           </div>
         </div>
-        @endforeach
-    </div>
-    {!! $sites->appends(request()->q)->links() !!}
+        @endforeach --}}
+    {{-- </div> --}}
+    {{-- {!! $sites->appends(request()->q)->links() !!} --}}
 @endsection

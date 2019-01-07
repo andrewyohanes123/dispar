@@ -2,8 +2,7 @@ import React, { Component, Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import FormMap from './FormMap';
-import Dropzone from 'react-dropzone';
-// import { fdatasync } from 'fs';
+import UploadingModal from './UploadingModal';
 
 export class TravelSiteForm extends Component {
   constructor(props) {
@@ -19,12 +18,14 @@ export class TravelSiteForm extends Component {
       latitude: 0,
       longitude: 0,
       types: [],
-      errors: []
+      errors: [],
+      progress: 0
     }
 
     this.getTypes = this.getTypes.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onFileSelected = this.onFileSelected.bind(this);
+    this.onFileSelect = this.onFileSelect.bind(this);
     this.postData = this.postData.bind(this);
     this.convertFile = this.convertFile.bind(this);
   }
@@ -70,15 +71,20 @@ export class TravelSiteForm extends Component {
     })
   }
 
-  async postData(ev) {
+  onFileSelect(ev) {
+    this.setState({
+      photo: ev.target.files[0],
+      files: Object.assign(ev.target.files[0], {
+        preview: URL.createObjectURL(ev.target.files[0])
+      })
+    }, () => console.log(this.state.files));
+  }
+
+  postData(ev) {
     const { name, address, description, travel_type_id, longitude, latitude, photo } = this.state;
     ev.preventDefault();
     const FD = new FormData();
-
-    for (let i = 0; i < photo.length; i++) {
-      // console.log(Array.from(photo)[0]);
-      FD.append('photo[]', photo[i], photo[i].name);
-    }
+    FD.append('photo', photo);
     FD.append('name', name);
     FD.append('address', address);
     FD.append('description', description);
@@ -86,22 +92,16 @@ export class TravelSiteForm extends Component {
     FD.append('longitude', longitude);
     FD.append('latitude', latitude);
 
-    try {
-      resp = await axios.post('/dashboard/tempat-wisata/', FD, { headers: { 'Content-Type': 'multipart/form-data' } })
-      console.log(resp.status);
-      // if (resp.status === 422)
-      // {
-      // } else {
-      this.setState({ name: '', address: '', description: '', travel_type_id: '', photo: [] })
-      // }
-    } catch (error) {
-      // console.log(error.response.data.errors)
-      this.setState({ errors: error.response.data.errors })
-    }
-    // return resp;
-    // }).catch(resp => console.log(resp));
-
-    // console.log(FD);
+    // try {
+      axios.post('/dashboard/tempat-wisata/', FD, {
+        onUploadProgress : progress => this.setState({ progress : Math.round((progress.loaded * 100) / progress.total)}) ,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(resp => {
+        this.uploadModal.openModal();
+        if (resp.data.site) this.setState({ name: '', address: '', description: '', travel_type_id: '', files : [], photo : [] }, () => this.fileInput.value = '');
+      }).catch(error => this.setState({ errors: error.response.data.errors }));
   }
 
   render() {
@@ -144,12 +144,6 @@ export class TravelSiteForm extends Component {
       height: '100%'
     };
 
-    const imgs = this.state.files.map((file, i) => (<div style={thumb} key={i}>
-      <div style={thumbInner}>
-        <img src={file.preview} style={img} alt="" />
-      </div>
-    </div>))
-
     return (
       <Fragment>
         <div className="row">
@@ -179,29 +173,17 @@ export class TravelSiteForm extends Component {
                 errors.description.map(error => (<span className="invalid-feedback">{error}</span>)) : ''
               }
               <label htmlFor="" className="control-label mb-1 mt-1">Gambar tempat wisata</label>
-              <Dropzone
-                accept={["image/jpg","image/jpeg", "image/png"]}
-                onDropAccepted={this.onFileSelected}
-                multiple={true}
-              >
-                {({ getRootProps, getInputProps }) => (
-                  <div style={baseStyle} {...getRootProps()}>
-                    <input {...getInputProps()} />
-                    <h1><i className="fa fa-file fa-lg"></i></h1>
-                    <p className="m-0 text-muted">{this.state.photo.length} file</p>
-                    {imgs}
-                  </div>
-                )}
-              </Dropzone>
+              <input type="file" name="photo" id="" onChange={this.onFileSelect} key={ref => this.fileInput = ref} multiple={false} accept={['image/jpg', 'image/jpeg', 'image/png']} className="form-control" />
               <hr />
               <button type="submit" onClick={this.postData} className="btn btn-outline-success btn-sm">Buat</button>
             </form>
           </div>
           <div className="col-md-6">
             <FormMap onCoordChange={({ latitude, longitude }) => this.setState({ latitude, longitude })} />
-
+            {this.state.files.length !== 0 && <img src={this.state.files.preview} alt="" className="img-fluid img-thumbnail my-2" />}
           </div>
         </div>
+        <UploadingModal ref={ref => this.uploadModal = ref} progress={this.state.progress} />
       </Fragment>
     )
   }

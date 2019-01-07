@@ -16,7 +16,7 @@ class TravelSiteController extends Controller
      */
     public function index()
     {
-        $sites = Site::whereHas('site_type', function($q) {
+        $sites = Site::whereHas('site_type', function ($q) {
             $q->where('name', 'Objek Wisata');
         })->paginate(6);
         return view('dashboard.travel', compact('sites'));
@@ -50,51 +50,43 @@ class TravelSiteController extends Controller
             'travel_type_id' => 'required',
             'latitude' => 'required',
             'longitude' => 'required',
-            'photo' => 'required|file|mimes:jpeg,jpg,png'
+            'photo' => 'required|file|mimes:jpeg,jpg,png|max:2048'
         ], [
             'name.required' => 'Masukkan nama tempat wisata',
-            'name.min' => 'Nama tempat wisata harus lebih dari atau sama dengan 4 karakter',            
+            'name.min' => 'Nama tempat wisata harus lebih dari atau sama dengan 4 karakter',
             'address.required' => 'Masukkan alamat tempat wisata',
-            'address.min' => 'Alamat tempat wisata harus lebih dari atau sama dengan 4 karakter',            
+            'address.min' => 'Alamat tempat wisata harus lebih dari atau sama dengan 4 karakter',
             'description.required' => 'Masukkan deskripsi tempat wisata',
-            'description.min' => 'Deskripsi tempat wisata harus lebih dari atau sama dengan 4 karakter',            
+            'description.min' => 'Deskripsi tempat wisata harus lebih dari atau sama dengan 4 karakter',
             'travel_type_id.required' => 'Pilih tipe wisata',
-            'photo.required' => 'Masukkan gambar tempat wisata'
+            'photo.required' => 'Masukkan gambar tempat wisata',
+            'photo.filr' => 'Gambar tempat wisata harus file',
+            'photo.required' => 'Format gambar tempat wisata adalah JPEG, JPG, dan PNG',
+            'photo.max' => 'Besar file gambar tempat wisata adalah 2MB',
         ]);
 
-        // $result = Site::create([
-        //     'name' => $request->name,
-        //     'slug' => str_slug(strtolower($request->name)),
-        //     'address' => $request->address,
-        //     'description' => $request->description,
-        //     'site_type_id' => 5,
-        //     'travel_type_id' => $request->travel_type_id,
-        //     'latitude' => $request->latitude,
-        //     'longitude' => $request->longitude
-        // ]);
+        $result = Site::create([
+            'name' => $request->name,
+            'slug' => str_slug(strtolower($request->name)),
+            'address' => $request->address,
+            'description' => $request->description,
+            'site_type_id' => 5,
+            'travel_type_id' => $request->travel_type_id,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude
+        ]);
 
-        // if ($result) {
-            // return ['hasFile' => $request->hasFile('photo')];
-            return ['file' => $request->hasFile('photo')];
-            if ($request->hasFile('photo'))
-            {
-                $files = [];
-                // return $request->file('photo');
-                // return $request->photo;
-                // foreach($request->photo as $i => $pic) {
-                //     // var_dump($pic);
-                //     $filenameWithExt = $pic->getClientOriginalName();
-                //     $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                //     $ext = $pic->getClientOriginalExtension();
-                //     $file = $filename . "_" . time() . '.' . $ext;
-                //     $path = $pic->storeAs('public/img',$file);
-                //     $files[$i] = ['photo' => $file, 'site_id' => $result->id];
-                // }
-                // SitePicture::create($files);
-                
+        if ($result) {
+            if ($request->hasFile('photo')) {
+                $filenameWithExt = $request->file('photo')->getClientOriginalName();
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+                $ext = $request->file('photo')->getClientOriginalExtension();
+                $file = $filename . "_" . time() . '.' . $ext;
+                $path = $request->file('photo')->storeAs('public/img', $file);
+                $upload = SitePicture::create(['photo' => $file, 'site_id' => $result->id]);
             }
-            // return ['files' => $result];
-        // }
+            return ['site' => $result, 'file' => $upload];
+        }
     }
 
     /**

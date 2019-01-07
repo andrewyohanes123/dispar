@@ -92,6 +92,20 @@
             </div>
           </div>
         </div>
+        <div class="col-md-8 mt-1 mb-2">
+          <div class="card">
+            <div class="card-header o-hidden d-flex flex-row justify-content-between align-items-center">
+                <p class="m-0 card-title d-inline-block"><i class="fa fa-picture-o fa-lg"></i>&nbsp;Banner</p>
+            </div>
+            @if (count($banner))
+              <img src="{{ asset('/storage/img' . $banner) }}" alt="" class="card-img rounded-0">
+            @else
+              <div class="card-body">
+                <h4 class="text-center m-0">Belum ada banner</h4>
+              </div>
+            @endif
+          </div>
+        </div>
       </div>
       {{--  --}}
     </div>

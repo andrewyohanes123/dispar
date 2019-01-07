@@ -16,3 +16,4 @@ require('./bootstrap');
 require('./components/Example');
 require('./components/Maps');
 require('./components/TravelSiteForm');
+require('./components/TravelSite');

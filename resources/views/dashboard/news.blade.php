@@ -37,7 +37,7 @@
               <p class="small text-muted">Di post oleh {{ $item->user->name }} pada {{ $item->created_at->format('d M Y') }}</p>
               <div id="news{{ $item->id }}" class="m-0 text-truncate">{!! $item->content !!}</div>
               <hr>
-              <a href="{{ route('berita.edit', ['id' => $item->id]) }}" title="Edit {{ $item->title }}" class="btn btn-warning btn-sm"><i class="fa fa-edit fa-lg"></i></a>
+              <a href="{{ route('berita.edit', ['id' => $item->id]) }}" data-toggle="tooltip" data-placement="top" title="Edit {{ $item->title }}" class="btn btn-warning btn-sm"><i class="fa fa-edit fa-lg"></i></a>
               <a href="{{ route('berita.destroy', ['id' => $item->id]) }}" title="Hapus {{ $item->title }}" data-id="{{ $item->id }}" class="btn btn-danger btn-sm hapus-berita"><i class="fa fa-remove fa-lg"></i></a>
               <a href="{{ route('berita.show', ['id' => $item->id]) }}" title="Preview {{ $item->title }}" class="btn btn-primary btn-sm"><i class="fa fa-eye fa-lg"></i></a>
               <form id="delete-form{{ $item->id }}" action="{{ route('berita.destroy', ['id' => $item->id]) }}" method="post">

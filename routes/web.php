@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', 'RootController@index')->name('root');
+Route::get('/', 'RootController@index')->name('root')->middleware('visitor');
 
 Auth::routes();
 
@@ -31,9 +31,12 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
     $facilities = \App\Site::whereNotIn('site_type_id', [5])->count();
     $pics = \App\SitePicture::count();
     $info = \App\Note::orderBy('id', 'DESC')->get()->first();
-    return view('dashboard.main', compact('main', 'site', 'pics', 'facilities', 'info'));
+    $banner = \App\Banner::orderBy('id', 'DESC')->get()->last();
+    return view('dashboard.main', compact('main', 'site', 'pics', 'facilities', 'info', 'banner'));
   })->name('dashboard.main');
   Route::resource('berita', 'NewsController');
   Route::resource('tempat-wisata', 'TravelSiteController');
   Route::redirect('/', '/dashboard/main', 301);
+  
+  Route::get('/travel-site', 'SiteControllerAPI@index');
 });

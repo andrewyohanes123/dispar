@@ -86,809 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./node_modules/@babel/runtime/node_modules/regenerator-runtime/runtime-module.js":
-/*!****************************************************************************************!*\
-  !*** ./node_modules/@babel/runtime/node_modules/regenerator-runtime/runtime-module.js ***!
-  \****************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Copyright (c) 2014-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-// This method of obtaining a reference to the global object needs to be
-// kept identical to the way it is obtained in runtime.js
-var g = (function() {
-  return this || (typeof self === "object" && self);
-})() || Function("return this")();
-
-// Use `getOwnPropertyNames` because not all browsers support calling
-// `hasOwnProperty` on the global `self` object in a worker. See #183.
-var hadRuntime = g.regeneratorRuntime &&
-  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
-
-// Save the old regeneratorRuntime in case it needs to be restored later.
-var oldRuntime = hadRuntime && g.regeneratorRuntime;
-
-// Force reevalutation of runtime.js.
-g.regeneratorRuntime = undefined;
-
-module.exports = __webpack_require__(/*! ./runtime */ "./node_modules/@babel/runtime/node_modules/regenerator-runtime/runtime.js");
-
-if (hadRuntime) {
-  // Restore the original runtime.
-  g.regeneratorRuntime = oldRuntime;
-} else {
-  // Remove the global property added by runtime.js.
-  try {
-    delete g.regeneratorRuntime;
-  } catch(e) {
-    g.regeneratorRuntime = undefined;
-  }
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/node_modules/regenerator-runtime/runtime.js":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/@babel/runtime/node_modules/regenerator-runtime/runtime.js ***!
-  \*********************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-/**
- * Copyright (c) 2014-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-!(function(global) {
-  "use strict";
-
-  var Op = Object.prototype;
-  var hasOwn = Op.hasOwnProperty;
-  var undefined; // More compressible than void 0.
-  var $Symbol = typeof Symbol === "function" ? Symbol : {};
-  var iteratorSymbol = $Symbol.iterator || "@@iterator";
-  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
-  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
-
-  var inModule = typeof module === "object";
-  var runtime = global.regeneratorRuntime;
-  if (runtime) {
-    if (inModule) {
-      // If regeneratorRuntime is defined globally and we're in a module,
-      // make the exports object identical to regeneratorRuntime.
-      module.exports = runtime;
-    }
-    // Don't bother evaluating the rest of this file if the runtime was
-    // already defined globally.
-    return;
-  }
-
-  // Define the runtime globally (as expected by generated code) as either
-  // module.exports (if we're in a module) or a new, empty object.
-  runtime = global.regeneratorRuntime = inModule ? module.exports : {};
-
-  function wrap(innerFn, outerFn, self, tryLocsList) {
-    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
-    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
-    var generator = Object.create(protoGenerator.prototype);
-    var context = new Context(tryLocsList || []);
-
-    // The ._invoke method unifies the implementations of the .next,
-    // .throw, and .return methods.
-    generator._invoke = makeInvokeMethod(innerFn, self, context);
-
-    return generator;
-  }
-  runtime.wrap = wrap;
-
-  // Try/catch helper to minimize deoptimizations. Returns a completion
-  // record like context.tryEntries[i].completion. This interface could
-  // have been (and was previously) designed to take a closure to be
-  // invoked without arguments, but in all the cases we care about we
-  // already have an existing method we want to call, so there's no need
-  // to create a new function object. We can even get away with assuming
-  // the method takes exactly one argument, since that happens to be true
-  // in every case, so we don't have to touch the arguments object. The
-  // only additional allocation required is the completion record, which
-  // has a stable shape and so hopefully should be cheap to allocate.
-  function tryCatch(fn, obj, arg) {
-    try {
-      return { type: "normal", arg: fn.call(obj, arg) };
-    } catch (err) {
-      return { type: "throw", arg: err };
-    }
-  }
-
-  var GenStateSuspendedStart = "suspendedStart";
-  var GenStateSuspendedYield = "suspendedYield";
-  var GenStateExecuting = "executing";
-  var GenStateCompleted = "completed";
-
-  // Returning this object from the innerFn has the same effect as
-  // breaking out of the dispatch switch statement.
-  var ContinueSentinel = {};
-
-  // Dummy constructor functions that we use as the .constructor and
-  // .constructor.prototype properties for functions that return Generator
-  // objects. For full spec compliance, you may wish to configure your
-  // minifier not to mangle the names of these two functions.
-  function Generator() {}
-  function GeneratorFunction() {}
-  function GeneratorFunctionPrototype() {}
-
-  // This is a polyfill for %IteratorPrototype% for environments that
-  // don't natively support it.
-  var IteratorPrototype = {};
-  IteratorPrototype[iteratorSymbol] = function () {
-    return this;
-  };
-
-  var getProto = Object.getPrototypeOf;
-  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
-  if (NativeIteratorPrototype &&
-      NativeIteratorPrototype !== Op &&
-      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
-    // This environment has a native %IteratorPrototype%; use it instead
-    // of the polyfill.
-    IteratorPrototype = NativeIteratorPrototype;
-  }
-
-  var Gp = GeneratorFunctionPrototype.prototype =
-    Generator.prototype = Object.create(IteratorPrototype);
-  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
-  GeneratorFunctionPrototype.constructor = GeneratorFunction;
-  GeneratorFunctionPrototype[toStringTagSymbol] =
-    GeneratorFunction.displayName = "GeneratorFunction";
-
-  // Helper for defining the .next, .throw, and .return methods of the
-  // Iterator interface in terms of a single ._invoke method.
-  function defineIteratorMethods(prototype) {
-    ["next", "throw", "return"].forEach(function(method) {
-      prototype[method] = function(arg) {
-        return this._invoke(method, arg);
-      };
-    });
-  }
-
-  runtime.isGeneratorFunction = function(genFun) {
-    var ctor = typeof genFun === "function" && genFun.constructor;
-    return ctor
-      ? ctor === GeneratorFunction ||
-        // For the native GeneratorFunction constructor, the best we can
-        // do is to check its .name property.
-        (ctor.displayName || ctor.name) === "GeneratorFunction"
-      : false;
-  };
-
-  runtime.mark = function(genFun) {
-    if (Object.setPrototypeOf) {
-      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
-    } else {
-      genFun.__proto__ = GeneratorFunctionPrototype;
-      if (!(toStringTagSymbol in genFun)) {
-        genFun[toStringTagSymbol] = "GeneratorFunction";
-      }
-    }
-    genFun.prototype = Object.create(Gp);
-    return genFun;
-  };
-
-  // Within the body of any async function, `await x` is transformed to
-  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
-  // `hasOwn.call(value, "__await")` to determine if the yielded value is
-  // meant to be awaited.
-  runtime.awrap = function(arg) {
-    return { __await: arg };
-  };
-
-  function AsyncIterator(generator) {
-    function invoke(method, arg, resolve, reject) {
-      var record = tryCatch(generator[method], generator, arg);
-      if (record.type === "throw") {
-        reject(record.arg);
-      } else {
-        var result = record.arg;
-        var value = result.value;
-        if (value &&
-            typeof value === "object" &&
-            hasOwn.call(value, "__await")) {
-          return Promise.resolve(value.__await).then(function(value) {
-            invoke("next", value, resolve, reject);
-          }, function(err) {
-            invoke("throw", err, resolve, reject);
-          });
-        }
-
-        return Promise.resolve(value).then(function(unwrapped) {
-          // When a yielded Promise is resolved, its final value becomes
-          // the .value of the Promise<{value,done}> result for the
-          // current iteration.
-          result.value = unwrapped;
-          resolve(result);
-        }, function(error) {
-          // If a rejected Promise was yielded, throw the rejection back
-          // into the async generator function so it can be handled there.
-          return invoke("throw", error, resolve, reject);
-        });
-      }
-    }
-
-    var previousPromise;
-
-    function enqueue(method, arg) {
-      function callInvokeWithMethodAndArg() {
-        return new Promise(function(resolve, reject) {
-          invoke(method, arg, resolve, reject);
-        });
-      }
-
-      return previousPromise =
-        // If enqueue has been called before, then we want to wait until
-        // all previous Promises have been resolved before calling invoke,
-        // so that results are always delivered in the correct order. If
-        // enqueue has not been called before, then it is important to
-        // call invoke immediately, without waiting on a callback to fire,
-        // so that the async generator function has the opportunity to do
-        // any necessary setup in a predictable way. This predictability
-        // is why the Promise constructor synchronously invokes its
-        // executor callback, and why async functions synchronously
-        // execute code before the first await. Since we implement simple
-        // async functions in terms of async generators, it is especially
-        // important to get this right, even though it requires care.
-        previousPromise ? previousPromise.then(
-          callInvokeWithMethodAndArg,
-          // Avoid propagating failures to Promises returned by later
-          // invocations of the iterator.
-          callInvokeWithMethodAndArg
-        ) : callInvokeWithMethodAndArg();
-    }
-
-    // Define the unified helper method that is used to implement .next,
-    // .throw, and .return (see defineIteratorMethods).
-    this._invoke = enqueue;
-  }
-
-  defineIteratorMethods(AsyncIterator.prototype);
-  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
-    return this;
-  };
-  runtime.AsyncIterator = AsyncIterator;
-
-  // Note that simple async functions are implemented on top of
-  // AsyncIterator objects; they just return a Promise for the value of
-  // the final result produced by the iterator.
-  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
-    var iter = new AsyncIterator(
-      wrap(innerFn, outerFn, self, tryLocsList)
-    );
-
-    return runtime.isGeneratorFunction(outerFn)
-      ? iter // If outerFn is a generator, return the full iterator.
-      : iter.next().then(function(result) {
-          return result.done ? result.value : iter.next();
-        });
-  };
-
-  function makeInvokeMethod(innerFn, self, context) {
-    var state = GenStateSuspendedStart;
-
-    return function invoke(method, arg) {
-      if (state === GenStateExecuting) {
-        throw new Error("Generator is already running");
-      }
-
-      if (state === GenStateCompleted) {
-        if (method === "throw") {
-          throw arg;
-        }
-
-        // Be forgiving, per 25.3.3.3.3 of the spec:
-        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
-        return doneResult();
-      }
-
-      context.method = method;
-      context.arg = arg;
-
-      while (true) {
-        var delegate = context.delegate;
-        if (delegate) {
-          var delegateResult = maybeInvokeDelegate(delegate, context);
-          if (delegateResult) {
-            if (delegateResult === ContinueSentinel) continue;
-            return delegateResult;
-          }
-        }
-
-        if (context.method === "next") {
-          // Setting context._sent for legacy support of Babel's
-          // function.sent implementation.
-          context.sent = context._sent = context.arg;
-
-        } else if (context.method === "throw") {
-          if (state === GenStateSuspendedStart) {
-            state = GenStateCompleted;
-            throw context.arg;
-          }
-
-          context.dispatchException(context.arg);
-
-        } else if (context.method === "return") {
-          context.abrupt("return", context.arg);
-        }
-
-        state = GenStateExecuting;
-
-        var record = tryCatch(innerFn, self, context);
-        if (record.type === "normal") {
-          // If an exception is thrown from innerFn, we leave state ===
-          // GenStateExecuting and loop back for another invocation.
-          state = context.done
-            ? GenStateCompleted
-            : GenStateSuspendedYield;
-
-          if (record.arg === ContinueSentinel) {
-            continue;
-          }
-
-          return {
-            value: record.arg,
-            done: context.done
-          };
-
-        } else if (record.type === "throw") {
-          state = GenStateCompleted;
-          // Dispatch the exception by looping back around to the
-          // context.dispatchException(context.arg) call above.
-          context.method = "throw";
-          context.arg = record.arg;
-        }
-      }
-    };
-  }
-
-  // Call delegate.iterator[context.method](context.arg) and handle the
-  // result, either by returning a { value, done } result from the
-  // delegate iterator, or by modifying context.method and context.arg,
-  // setting context.delegate to null, and returning the ContinueSentinel.
-  function maybeInvokeDelegate(delegate, context) {
-    var method = delegate.iterator[context.method];
-    if (method === undefined) {
-      // A .throw or .return when the delegate iterator has no .throw
-      // method always terminates the yield* loop.
-      context.delegate = null;
-
-      if (context.method === "throw") {
-        if (delegate.iterator.return) {
-          // If the delegate iterator has a return method, give it a
-          // chance to clean up.
-          context.method = "return";
-          context.arg = undefined;
-          maybeInvokeDelegate(delegate, context);
-
-          if (context.method === "throw") {
-            // If maybeInvokeDelegate(context) changed context.method from
-            // "return" to "throw", let that override the TypeError below.
-            return ContinueSentinel;
-          }
-        }
-
-        context.method = "throw";
-        context.arg = new TypeError(
-          "The iterator does not provide a 'throw' method");
-      }
-
-      return ContinueSentinel;
-    }
-
-    var record = tryCatch(method, delegate.iterator, context.arg);
-
-    if (record.type === "throw") {
-      context.method = "throw";
-      context.arg = record.arg;
-      context.delegate = null;
-      return ContinueSentinel;
-    }
-
-    var info = record.arg;
-
-    if (! info) {
-      context.method = "throw";
-      context.arg = new TypeError("iterator result is not an object");
-      context.delegate = null;
-      return ContinueSentinel;
-    }
-
-    if (info.done) {
-      // Assign the result of the finished delegate to the temporary
-      // variable specified by delegate.resultName (see delegateYield).
-      context[delegate.resultName] = info.value;
-
-      // Resume execution at the desired location (see delegateYield).
-      context.next = delegate.nextLoc;
-
-      // If context.method was "throw" but the delegate handled the
-      // exception, let the outer generator proceed normally. If
-      // context.method was "next", forget context.arg since it has been
-      // "consumed" by the delegate iterator. If context.method was
-      // "return", allow the original .return call to continue in the
-      // outer generator.
-      if (context.method !== "return") {
-        context.method = "next";
-        context.arg = undefined;
-      }
-
-    } else {
-      // Re-yield the result returned by the delegate method.
-      return info;
-    }
-
-    // The delegate iterator is finished, so forget it and continue with
-    // the outer generator.
-    context.delegate = null;
-    return ContinueSentinel;
-  }
-
-  // Define Generator.prototype.{next,throw,return} in terms of the
-  // unified ._invoke helper method.
-  defineIteratorMethods(Gp);
-
-  Gp[toStringTagSymbol] = "Generator";
-
-  // A Generator should always return itself as the iterator object when the
-  // @@iterator function is called on it. Some browsers' implementations of the
-  // iterator prototype chain incorrectly implement this, causing the Generator
-  // object to not be returned from this call. This ensures that doesn't happen.
-  // See https://github.com/facebook/regenerator/issues/274 for more details.
-  Gp[iteratorSymbol] = function() {
-    return this;
-  };
-
-  Gp.toString = function() {
-    return "[object Generator]";
-  };
-
-  function pushTryEntry(locs) {
-    var entry = { tryLoc: locs[0] };
-
-    if (1 in locs) {
-      entry.catchLoc = locs[1];
-    }
-
-    if (2 in locs) {
-      entry.finallyLoc = locs[2];
-      entry.afterLoc = locs[3];
-    }
-
-    this.tryEntries.push(entry);
-  }
-
-  function resetTryEntry(entry) {
-    var record = entry.completion || {};
-    record.type = "normal";
-    delete record.arg;
-    entry.completion = record;
-  }
-
-  function Context(tryLocsList) {
-    // The root entry object (effectively a try statement without a catch
-    // or a finally block) gives us a place to store values thrown from
-    // locations where there is no enclosing try statement.
-    this.tryEntries = [{ tryLoc: "root" }];
-    tryLocsList.forEach(pushTryEntry, this);
-    this.reset(true);
-  }
-
-  runtime.keys = function(object) {
-    var keys = [];
-    for (var key in object) {
-      keys.push(key);
-    }
-    keys.reverse();
-
-    // Rather than returning an object with a next method, we keep
-    // things simple and return the next function itself.
-    return function next() {
-      while (keys.length) {
-        var key = keys.pop();
-        if (key in object) {
-          next.value = key;
-          next.done = false;
-          return next;
-        }
-      }
-
-      // To avoid creating an additional object, we just hang the .value
-      // and .done properties off the next function object itself. This
-      // also ensures that the minifier will not anonymize the function.
-      next.done = true;
-      return next;
-    };
-  };
-
-  function values(iterable) {
-    if (iterable) {
-      var iteratorMethod = iterable[iteratorSymbol];
-      if (iteratorMethod) {
-        return iteratorMethod.call(iterable);
-      }
-
-      if (typeof iterable.next === "function") {
-        return iterable;
-      }
-
-      if (!isNaN(iterable.length)) {
-        var i = -1, next = function next() {
-          while (++i < iterable.length) {
-            if (hasOwn.call(iterable, i)) {
-              next.value = iterable[i];
-              next.done = false;
-              return next;
-            }
-          }
-
-          next.value = undefined;
-          next.done = true;
-
-          return next;
-        };
-
-        return next.next = next;
-      }
-    }
-
-    // Return an iterator with no values.
-    return { next: doneResult };
-  }
-  runtime.values = values;
-
-  function doneResult() {
-    return { value: undefined, done: true };
-  }
-
-  Context.prototype = {
-    constructor: Context,
-
-    reset: function(skipTempReset) {
-      this.prev = 0;
-      this.next = 0;
-      // Resetting context._sent for legacy support of Babel's
-      // function.sent implementation.
-      this.sent = this._sent = undefined;
-      this.done = false;
-      this.delegate = null;
-
-      this.method = "next";
-      this.arg = undefined;
-
-      this.tryEntries.forEach(resetTryEntry);
-
-      if (!skipTempReset) {
-        for (var name in this) {
-          // Not sure about the optimal order of these conditions:
-          if (name.charAt(0) === "t" &&
-              hasOwn.call(this, name) &&
-              !isNaN(+name.slice(1))) {
-            this[name] = undefined;
-          }
-        }
-      }
-    },
-
-    stop: function() {
-      this.done = true;
-
-      var rootEntry = this.tryEntries[0];
-      var rootRecord = rootEntry.completion;
-      if (rootRecord.type === "throw") {
-        throw rootRecord.arg;
-      }
-
-      return this.rval;
-    },
-
-    dispatchException: function(exception) {
-      if (this.done) {
-        throw exception;
-      }
-
-      var context = this;
-      function handle(loc, caught) {
-        record.type = "throw";
-        record.arg = exception;
-        context.next = loc;
-
-        if (caught) {
-          // If the dispatched exception was caught by a catch block,
-          // then let that catch block handle the exception normally.
-          context.method = "next";
-          context.arg = undefined;
-        }
-
-        return !! caught;
-      }
-
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        var record = entry.completion;
-
-        if (entry.tryLoc === "root") {
-          // Exception thrown outside of any try block that could handle
-          // it, so set the completion value of the entire function to
-          // throw the exception.
-          return handle("end");
-        }
-
-        if (entry.tryLoc <= this.prev) {
-          var hasCatch = hasOwn.call(entry, "catchLoc");
-          var hasFinally = hasOwn.call(entry, "finallyLoc");
-
-          if (hasCatch && hasFinally) {
-            if (this.prev < entry.catchLoc) {
-              return handle(entry.catchLoc, true);
-            } else if (this.prev < entry.finallyLoc) {
-              return handle(entry.finallyLoc);
-            }
-
-          } else if (hasCatch) {
-            if (this.prev < entry.catchLoc) {
-              return handle(entry.catchLoc, true);
-            }
-
-          } else if (hasFinally) {
-            if (this.prev < entry.finallyLoc) {
-              return handle(entry.finallyLoc);
-            }
-
-          } else {
-            throw new Error("try statement without catch or finally");
-          }
-        }
-      }
-    },
-
-    abrupt: function(type, arg) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.tryLoc <= this.prev &&
-            hasOwn.call(entry, "finallyLoc") &&
-            this.prev < entry.finallyLoc) {
-          var finallyEntry = entry;
-          break;
-        }
-      }
-
-      if (finallyEntry &&
-          (type === "break" ||
-           type === "continue") &&
-          finallyEntry.tryLoc <= arg &&
-          arg <= finallyEntry.finallyLoc) {
-        // Ignore the finally entry if control is not jumping to a
-        // location outside the try/catch block.
-        finallyEntry = null;
-      }
-
-      var record = finallyEntry ? finallyEntry.completion : {};
-      record.type = type;
-      record.arg = arg;
-
-      if (finallyEntry) {
-        this.method = "next";
-        this.next = finallyEntry.finallyLoc;
-        return ContinueSentinel;
-      }
-
-      return this.complete(record);
-    },
-
-    complete: function(record, afterLoc) {
-      if (record.type === "throw") {
-        throw record.arg;
-      }
-
-      if (record.type === "break" ||
-          record.type === "continue") {
-        this.next = record.arg;
-      } else if (record.type === "return") {
-        this.rval = this.arg = record.arg;
-        this.method = "return";
-        this.next = "end";
-      } else if (record.type === "normal" && afterLoc) {
-        this.next = afterLoc;
-      }
-
-      return ContinueSentinel;
-    },
-
-    finish: function(finallyLoc) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.finallyLoc === finallyLoc) {
-          this.complete(entry.completion, entry.afterLoc);
-          resetTryEntry(entry);
-          return ContinueSentinel;
-        }
-      }
-    },
-
-    "catch": function(tryLoc) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.tryLoc === tryLoc) {
-          var record = entry.completion;
-          if (record.type === "throw") {
-            var thrown = record.arg;
-            resetTryEntry(entry);
-          }
-          return thrown;
-        }
-      }
-
-      // The context.catch method must only be called with a location
-      // argument that corresponds to a known catch block.
-      throw new Error("illegal catch attempt");
-    },
-
-    delegateYield: function(iterable, resultName, nextLoc) {
-      this.delegate = {
-        iterator: values(iterable),
-        resultName: resultName,
-        nextLoc: nextLoc
-      };
-
-      if (this.method === "next") {
-        // Deliberately forget the last sent value so that we don't
-        // accidentally pass it on to the delegate.
-        this.arg = undefined;
-      }
-
-      return ContinueSentinel;
-    }
-  };
-})(
-  // In sloppy mode, unbound `this` refers to the global object, fallback to
-  // Function constructor if we're in global strict mode. That is sadly a form
-  // of indirect eval which violates Content Security Policy.
-  (function() {
-    return this || (typeof self === "object" && self);
-  })() || Function("return this")()
-);
-
-
-/***/ }),
-
-/***/ "./node_modules/@babel/runtime/regenerator/index.js":
-/*!**********************************************************!*\
-  !*** ./node_modules/@babel/runtime/regenerator/index.js ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! regenerator-runtime */ "./node_modules/@babel/runtime/node_modules/regenerator-runtime/runtime-module.js");
-
-
-/***/ }),
-
-/***/ "./node_modules/attr-accept/dist/index.js":
-/*!************************************************!*\
-  !*** ./node_modules/attr-accept/dist/index.js ***!
-  \************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports=function(t){function n(e){if(r[e])return r[e].exports;var o=r[e]={i:e,l:!1,exports:{}};return t[e].call(o.exports,o,o.exports,n),o.l=!0,o.exports}var r={};return n.m=t,n.c=r,n.d=function(t,r,e){n.o(t,r)||Object.defineProperty(t,r,{configurable:!1,enumerable:!0,get:e})},n.n=function(t){var r=t&&t.__esModule?function(){return t.default}:function(){return t};return n.d(r,"a",r),r},n.o=function(t,n){return Object.prototype.hasOwnProperty.call(t,n)},n.p="",n(n.s=13)}([function(t,n){var r=t.exports="undefined"!=typeof window&&window.Math==Math?window:"undefined"!=typeof self&&self.Math==Math?self:Function("return this")();"number"==typeof __g&&(__g=r)},function(t,n){t.exports=function(t){return"object"==typeof t?null!==t:"function"==typeof t}},function(t,n){var r=t.exports={version:"2.5.0"};"number"==typeof __e&&(__e=r)},function(t,n,r){t.exports=!r(4)(function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a})},function(t,n){t.exports=function(t){try{return!!t()}catch(t){return!0}}},function(t,n){var r={}.toString;t.exports=function(t){return r.call(t).slice(8,-1)}},function(t,n,r){var e=r(32)("wks"),o=r(9),i=r(0).Symbol,u="function"==typeof i;(t.exports=function(t){return e[t]||(e[t]=u&&i[t]||(u?i:o)("Symbol."+t))}).store=e},function(t,n,r){var e=r(0),o=r(2),i=r(8),u=r(22),c=r(10),f=function(t,n,r){var a,s,p,l,v=t&f.F,y=t&f.G,h=t&f.S,d=t&f.P,x=t&f.B,g=y?e:h?e[n]||(e[n]={}):(e[n]||{}).prototype,m=y?o:o[n]||(o[n]={}),b=m.prototype||(m.prototype={});y&&(r=n);for(a in r)s=!v&&g&&void 0!==g[a],p=(s?g:r)[a],l=x&&s?c(p,e):d&&"function"==typeof p?c(Function.call,p):p,g&&u(g,a,p,t&f.U),m[a]!=p&&i(m,a,l),d&&b[a]!=p&&(b[a]=p)};e.core=o,f.F=1,f.G=2,f.S=4,f.P=8,f.B=16,f.W=32,f.U=64,f.R=128,t.exports=f},function(t,n,r){var e=r(16),o=r(21);t.exports=r(3)?function(t,n,r){return e.f(t,n,o(1,r))}:function(t,n,r){return t[n]=r,t}},function(t,n){var r=0,e=Math.random();t.exports=function(t){return"Symbol(".concat(void 0===t?"":t,")_",(++r+e).toString(36))}},function(t,n,r){var e=r(24);t.exports=function(t,n,r){if(e(t),void 0===n)return t;switch(r){case 1:return function(r){return t.call(n,r)};case 2:return function(r,e){return t.call(n,r,e)};case 3:return function(r,e,o){return t.call(n,r,e,o)}}return function(){return t.apply(n,arguments)}}},function(t,n){t.exports=function(t){if(void 0==t)throw TypeError("Can't call method on  "+t);return t}},function(t,n,r){var e=r(28),o=Math.min;t.exports=function(t){return t>0?o(e(t),9007199254740991):0}},function(t,n,r){"use strict";n.__esModule=!0,n.default=function(t,n){if(t&&n){var r=Array.isArray(n)?n:n.split(","),e=t.name||"",o=t.type||"",i=o.replace(/\/.*$/,"");return r.some(function(t){var n=t.trim();return"."===n.charAt(0)?e.toLowerCase().endsWith(n.toLowerCase()):n.endsWith("/*")?i===n.replace(/\/.*$/,""):o===n})}return!0},r(14),r(34)},function(t,n,r){r(15),t.exports=r(2).Array.some},function(t,n,r){"use strict";var e=r(7),o=r(25)(3);e(e.P+e.F*!r(33)([].some,!0),"Array",{some:function(t){return o(this,t,arguments[1])}})},function(t,n,r){var e=r(17),o=r(18),i=r(20),u=Object.defineProperty;n.f=r(3)?Object.defineProperty:function(t,n,r){if(e(t),n=i(n,!0),e(r),o)try{return u(t,n,r)}catch(t){}if("get"in r||"set"in r)throw TypeError("Accessors not supported!");return"value"in r&&(t[n]=r.value),t}},function(t,n,r){var e=r(1);t.exports=function(t){if(!e(t))throw TypeError(t+" is not an object!");return t}},function(t,n,r){t.exports=!r(3)&&!r(4)(function(){return 7!=Object.defineProperty(r(19)("div"),"a",{get:function(){return 7}}).a})},function(t,n,r){var e=r(1),o=r(0).document,i=e(o)&&e(o.createElement);t.exports=function(t){return i?o.createElement(t):{}}},function(t,n,r){var e=r(1);t.exports=function(t,n){if(!e(t))return t;var r,o;if(n&&"function"==typeof(r=t.toString)&&!e(o=r.call(t)))return o;if("function"==typeof(r=t.valueOf)&&!e(o=r.call(t)))return o;if(!n&&"function"==typeof(r=t.toString)&&!e(o=r.call(t)))return o;throw TypeError("Can't convert object to primitive value")}},function(t,n){t.exports=function(t,n){return{enumerable:!(1&t),configurable:!(2&t),writable:!(4&t),value:n}}},function(t,n,r){var e=r(0),o=r(8),i=r(23),u=r(9)("src"),c=Function.toString,f=(""+c).split("toString");r(2).inspectSource=function(t){return c.call(t)},(t.exports=function(t,n,r,c){var a="function"==typeof r;a&&(i(r,"name")||o(r,"name",n)),t[n]!==r&&(a&&(i(r,u)||o(r,u,t[n]?""+t[n]:f.join(String(n)))),t===e?t[n]=r:c?t[n]?t[n]=r:o(t,n,r):(delete t[n],o(t,n,r)))})(Function.prototype,"toString",function(){return"function"==typeof this&&this[u]||c.call(this)})},function(t,n){var r={}.hasOwnProperty;t.exports=function(t,n){return r.call(t,n)}},function(t,n){t.exports=function(t){if("function"!=typeof t)throw TypeError(t+" is not a function!");return t}},function(t,n,r){var e=r(10),o=r(26),i=r(27),u=r(12),c=r(29);t.exports=function(t,n){var r=1==t,f=2==t,a=3==t,s=4==t,p=6==t,l=5==t||p,v=n||c;return function(n,c,y){for(var h,d,x=i(n),g=o(x),m=e(c,y,3),b=u(g.length),_=0,w=r?v(n,b):f?v(n,0):void 0;b>_;_++)if((l||_ in g)&&(h=g[_],d=m(h,_,x),t))if(r)w[_]=d;else if(d)switch(t){case 3:return!0;case 5:return h;case 6:return _;case 2:w.push(h)}else if(s)return!1;return p?-1:a||s?s:w}}},function(t,n,r){var e=r(5);t.exports=Object("z").propertyIsEnumerable(0)?Object:function(t){return"String"==e(t)?t.split(""):Object(t)}},function(t,n,r){var e=r(11);t.exports=function(t){return Object(e(t))}},function(t,n){var r=Math.ceil,e=Math.floor;t.exports=function(t){return isNaN(t=+t)?0:(t>0?e:r)(t)}},function(t,n,r){var e=r(30);t.exports=function(t,n){return new(e(t))(n)}},function(t,n,r){var e=r(1),o=r(31),i=r(6)("species");t.exports=function(t){var n;return o(t)&&(n=t.constructor,"function"!=typeof n||n!==Array&&!o(n.prototype)||(n=void 0),e(n)&&null===(n=n[i])&&(n=void 0)),void 0===n?Array:n}},function(t,n,r){var e=r(5);t.exports=Array.isArray||function(t){return"Array"==e(t)}},function(t,n,r){var e=r(0),o=e["__core-js_shared__"]||(e["__core-js_shared__"]={});t.exports=function(t){return o[t]||(o[t]={})}},function(t,n,r){"use strict";var e=r(4);t.exports=function(t,n){return!!t&&e(function(){n?t.call(null,function(){},1):t.call(null)})}},function(t,n,r){r(35),t.exports=r(2).String.endsWith},function(t,n,r){"use strict";var e=r(7),o=r(12),i=r(36),u="".endsWith;e(e.P+e.F*r(38)("endsWith"),"String",{endsWith:function(t){var n=i(this,t,"endsWith"),r=arguments.length>1?arguments[1]:void 0,e=o(n.length),c=void 0===r?e:Math.min(o(r),e),f=String(t);return u?u.call(n,f,c):n.slice(c-f.length,c)===f}})},function(t,n,r){var e=r(37),o=r(11);t.exports=function(t,n,r){if(e(n))throw TypeError("String#"+r+" doesn't accept regex!");return String(o(t))}},function(t,n,r){var e=r(1),o=r(5),i=r(6)("match");t.exports=function(t){var n;return e(t)&&(void 0!==(n=t[i])?!!n:"RegExp"==o(t))}},function(t,n,r){var e=r(6)("match");t.exports=function(t){var n=/./;try{"/./"[t](n)}catch(r){try{return n[e]=!1,!"/./"[t](n)}catch(t){}}return!0}}]);
-
-/***/ }),
-
 /***/ "./node_modules/axios/index.js":
 /*!*************************************!*\
   !*** ./node_modules/axios/index.js ***!
@@ -63967,724 +63164,6 @@ if (false) {} else {
 
 /***/ }),
 
-/***/ "./node_modules/react-dropzone/dist/es/index.js":
-/*!******************************************************!*\
-  !*** ./node_modules/react-dropzone/dist/es/index.js ***!
-  \******************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! prop-types */ "./node_modules/prop-types/index.js");
-/* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./node_modules/react-dropzone/dist/es/utils/index.js");
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-/* eslint prefer-template: 0 */
-
-
-
-
-
-var Dropzone = function (_React$Component) {
-  _inherits(Dropzone, _React$Component);
-
-  function Dropzone() {
-    var _ref;
-
-    var _temp, _this, _ret;
-
-    _classCallCheck(this, Dropzone);
-
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
-    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = Dropzone.__proto__ || Object.getPrototypeOf(Dropzone)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-      draggedFiles: [],
-      acceptedFiles: [],
-      rejectedFiles: []
-    }, _this.isFileDialogActive = false, _this.onDocumentDrop = function (evt) {
-      if (_this.node && _this.node.contains(evt.target)) {
-        // if we intercepted an event for our instance, let it propagate down to the instance's onDrop handler
-        return;
-      }
-      evt.preventDefault();
-      _this.dragTargets = [];
-    }, _this.onDragStart = function (evt) {
-      evt.persist();
-      if (_this.props.onDragStart && Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDragDataWithFiles"])(evt)) {
-        _this.props.onDragStart.call(_this, evt);
-      }
-    }, _this.onDragEnter = function (evt) {
-      evt.preventDefault();
-
-      // Count the dropzone and any children that are entered.
-      if (_this.dragTargets.indexOf(evt.target) === -1) {
-        _this.dragTargets.push(evt.target);
-      }
-
-      evt.persist();
-
-      if (Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDragDataWithFiles"])(evt)) {
-        Promise.resolve(_this.props.getDataTransferItems(evt)).then(function (draggedFiles) {
-          if (evt.isPropagationStopped()) {
-            return;
-          }
-
-          _this.setState({
-            draggedFiles: draggedFiles,
-            // Do not rely on files for the drag state. It doesn't work in Safari.
-            isDragActive: true
-          });
-        });
-
-        if (_this.props.onDragEnter) {
-          _this.props.onDragEnter.call(_this, evt);
-        }
-      }
-    }, _this.onDragOver = function (evt) {
-      // eslint-disable-line class-methods-use-this
-      evt.preventDefault();
-      evt.persist();
-
-      if (_this.props.onDragOver && Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDragDataWithFiles"])(evt)) {
-        _this.props.onDragOver.call(_this, evt);
-      }
-
-      return false;
-    }, _this.onDragLeave = function (evt) {
-      evt.preventDefault();
-      evt.persist();
-
-      // Only deactivate once the dropzone and all children have been left.
-      _this.dragTargets = _this.dragTargets.filter(function (el) {
-        return el !== evt.target && _this.node.contains(el);
-      });
-      if (_this.dragTargets.length > 0) {
-        return;
-      }
-
-      // Clear dragging files state
-      _this.setState({
-        isDragActive: false,
-        draggedFiles: []
-      });
-
-      if (_this.props.onDragLeave && Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDragDataWithFiles"])(evt)) {
-        _this.props.onDragLeave.call(_this, evt);
-      }
-    }, _this.onDrop = function (evt) {
-      var _this$props = _this.props,
-          onDrop = _this$props.onDrop,
-          onDropAccepted = _this$props.onDropAccepted,
-          onDropRejected = _this$props.onDropRejected,
-          multiple = _this$props.multiple,
-          accept = _this$props.accept,
-          getDataTransferItems = _this$props.getDataTransferItems;
-
-      // Stop default browser behavior
-
-      evt.preventDefault();
-
-      // Persist event for later usage
-      evt.persist();
-
-      // Reset the counter along with the drag on a drop.
-      _this.dragTargets = [];
-      _this.isFileDialogActive = false;
-
-      // Clear files value
-      _this.draggedFiles = null;
-
-      // Reset drag state
-      _this.setState({
-        isDragActive: false,
-        draggedFiles: []
-      });
-
-      if (Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isDragDataWithFiles"])(evt)) {
-        Promise.resolve(getDataTransferItems(evt)).then(function (fileList) {
-          var acceptedFiles = [];
-          var rejectedFiles = [];
-
-          if (evt.isPropagationStopped()) {
-            return;
-          }
-
-          fileList.forEach(function (file) {
-            if (Object(_utils__WEBPACK_IMPORTED_MODULE_2__["fileAccepted"])(file, accept) && Object(_utils__WEBPACK_IMPORTED_MODULE_2__["fileMatchSize"])(file, _this.props.maxSize, _this.props.minSize)) {
-              acceptedFiles.push(file);
-            } else {
-              rejectedFiles.push(file);
-            }
-          });
-
-          if (!multiple && acceptedFiles.length > 1) {
-            // if not in multi mode add any extra accepted files to rejected.
-            // This will allow end users to easily ignore a multi file drop in "single" mode.
-            rejectedFiles.push.apply(rejectedFiles, _toConsumableArray(acceptedFiles.splice(0)));
-          }
-
-          // Update `acceptedFiles` and `rejectedFiles` state
-          // This will make children render functions receive the appropriate
-          // values
-          _this.setState({ acceptedFiles: acceptedFiles, rejectedFiles: rejectedFiles }, function () {
-            if (onDrop) {
-              onDrop.call(_this, acceptedFiles, rejectedFiles, evt);
-            }
-
-            if (rejectedFiles.length > 0 && onDropRejected) {
-              onDropRejected.call(_this, rejectedFiles, evt);
-            }
-
-            if (acceptedFiles.length > 0 && onDropAccepted) {
-              onDropAccepted.call(_this, acceptedFiles, evt);
-            }
-          });
-        });
-      }
-    }, _this.onClick = function (evt) {
-      var _this$props2 = _this.props,
-          onClick = _this$props2.onClick,
-          disableClick = _this$props2.disableClick;
-
-      // if onClick prop is given, run it first
-
-      if (onClick) {
-        onClick.call(_this, evt);
-      }
-
-      // if disableClick is not set and the event hasn't been default prefented within
-      // the onClick listener, open the file dialog
-      if (!disableClick && !evt.isDefaultPrevented()) {
-        evt.stopPropagation();
-
-        // in IE11/Edge the file-browser dialog is blocking, ensure this is behind setTimeout
-        // this is so react can handle state changes in the onClick prop above above
-        // see: https://github.com/react-dropzone/react-dropzone/issues/450
-        if (Object(_utils__WEBPACK_IMPORTED_MODULE_2__["isIeOrEdge"])()) {
-          setTimeout(_this.open, 0);
-        } else {
-          _this.open();
-        }
-      }
-    }, _this.onInputElementClick = function (evt) {
-      evt.stopPropagation();
-    }, _this.onFileDialogCancel = function () {
-      // timeout will not recognize context of this method
-      var onFileDialogCancel = _this.props.onFileDialogCancel;
-      // execute the timeout only if the FileDialog is opened in the browser
-
-      if (_this.isFileDialogActive) {
-        setTimeout(function () {
-          if (_this.input != null) {
-            // Returns an object as FileList
-            var files = _this.input.files;
-
-
-            if (!files.length) {
-              _this.isFileDialogActive = false;
-
-              if (typeof onFileDialogCancel === 'function') {
-                onFileDialogCancel();
-              }
-            }
-          }
-        }, 300);
-      }
-    }, _this.onFocus = function (evt) {
-      var onFocus = _this.props.onFocus;
-
-      if (onFocus) {
-        onFocus.call(_this, evt);
-      }
-      if (!evt.isDefaultPrevented()) {
-        _this.setState({ isFocused: true });
-      }
-    }, _this.onBlur = function (evt) {
-      var onBlur = _this.props.onBlur;
-
-      if (onBlur) {
-        onBlur.call(_this, evt);
-      }
-      if (!evt.isDefaultPrevented()) {
-        _this.setState({ isFocused: false });
-      }
-    }, _this.onKeyDown = function (evt) {
-      var onKeyDown = _this.props.onKeyDown;
-
-      if (!_this.node.isEqualNode(evt.target)) {
-        return;
-      }
-
-      if (onKeyDown) {
-        onKeyDown.call(_this, evt);
-      }
-
-      if (!evt.isDefaultPrevented() && (evt.keyCode === 32 || evt.keyCode === 13)) {
-        evt.preventDefault();
-        _this.open();
-      }
-    }, _this.composeHandler = function (handler) {
-      if (_this.props.disabled) {
-        return null;
-      }
-      return handler;
-    }, _this.getRootProps = function () {
-      var _extends2;
-
-      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-      var _ref2$refKey = _ref2.refKey,
-          refKey = _ref2$refKey === undefined ? 'ref' : _ref2$refKey,
-          onKeyDown = _ref2.onKeyDown,
-          onFocus = _ref2.onFocus,
-          onBlur = _ref2.onBlur,
-          onClick = _ref2.onClick,
-          onDragStart = _ref2.onDragStart,
-          onDragEnter = _ref2.onDragEnter,
-          onDragOver = _ref2.onDragOver,
-          onDragLeave = _ref2.onDragLeave,
-          onDrop = _ref2.onDrop,
-          rest = _objectWithoutProperties(_ref2, ['refKey', 'onKeyDown', 'onFocus', 'onBlur', 'onClick', 'onDragStart', 'onDragEnter', 'onDragOver', 'onDragLeave', 'onDrop']);
-
-      return _extends((_extends2 = {
-        onKeyDown: _this.composeHandler(onKeyDown ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onKeyDown, _this.onKeyDown) : _this.onKeyDown),
-        onFocus: _this.composeHandler(onFocus ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onFocus, _this.onFocus) : _this.onFocus),
-        onBlur: _this.composeHandler(onBlur ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onBlur, _this.onBlur) : _this.onBlur),
-        onClick: _this.composeHandler(onClick ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onClick, _this.onClick) : _this.onClick),
-        onDragStart: _this.composeHandler(onDragStart ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onDragStart, _this.onDragStart) : _this.onDragStart),
-        onDragEnter: _this.composeHandler(onDragEnter ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onDragEnter, _this.onDragEnter) : _this.onDragEnter),
-        onDragOver: _this.composeHandler(onDragOver ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onDragOver, _this.onDragOver) : _this.onDragOver),
-        onDragLeave: _this.composeHandler(onDragLeave ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onDragLeave, _this.onDragLeave) : _this.onDragLeave),
-        onDrop: _this.composeHandler(onDrop ? Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onDrop, _this.onDrop) : _this.onDrop)
-      }, _defineProperty(_extends2, refKey, _this.setNodeRef), _defineProperty(_extends2, 'tabIndex', _this.props.disabled ? -1 : 0), _extends2), rest);
-    }, _this.getInputProps = function () {
-      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-      var _ref3$refKey = _ref3.refKey,
-          refKey = _ref3$refKey === undefined ? 'ref' : _ref3$refKey,
-          onChange = _ref3.onChange,
-          onClick = _ref3.onClick,
-          rest = _objectWithoutProperties(_ref3, ['refKey', 'onChange', 'onClick']);
-
-      var _this$props3 = _this.props,
-          accept = _this$props3.accept,
-          multiple = _this$props3.multiple,
-          name = _this$props3.name;
-
-      var inputProps = _defineProperty({
-        accept: accept,
-        type: 'file',
-        style: { display: 'none' },
-        multiple: _utils__WEBPACK_IMPORTED_MODULE_2__["supportMultiple"] && multiple,
-        onChange: Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onChange, _this.onDrop),
-        onClick: Object(_utils__WEBPACK_IMPORTED_MODULE_2__["composeEventHandlers"])(onClick, _this.onInputElementClick),
-        autoComplete: 'off',
-        tabIndex: -1
-      }, refKey, _this.setInputRef);
-      if (name && name.length) {
-        inputProps.name = name;
-      }
-      return _extends({}, inputProps, rest);
-    }, _this.setNodeRef = function (node) {
-      _this.node = node;
-    }, _this.setInputRef = function (input) {
-      _this.input = input;
-    }, _this.open = function () {
-      _this.isFileDialogActive = true;
-      if (_this.input) {
-        _this.input.value = null;
-        _this.input.click();
-      }
-    }, _temp), _possibleConstructorReturn(_this, _ret);
-  }
-
-  _createClass(Dropzone, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var preventDropOnDocument = this.props.preventDropOnDocument;
-
-      this.dragTargets = [];
-
-      if (preventDropOnDocument) {
-        document.addEventListener('dragover', _utils__WEBPACK_IMPORTED_MODULE_2__["onDocumentDragOver"], false);
-        document.addEventListener('drop', this.onDocumentDrop, false);
-      }
-
-      window.addEventListener('focus', this.onFileDialogCancel, false);
-    }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      var preventDropOnDocument = this.props.preventDropOnDocument;
-
-      if (preventDropOnDocument) {
-        document.removeEventListener('dragover', _utils__WEBPACK_IMPORTED_MODULE_2__["onDocumentDragOver"]);
-        document.removeEventListener('drop', this.onDocumentDrop);
-      }
-
-      window.removeEventListener('focus', this.onFileDialogCancel, false);
-    }
-
-    /**
-     * Open system file upload dialog.
-     *
-     * @public
-     */
-
-  }, {
-    key: 'render',
-    value: function render() {
-      var _props = this.props,
-          children = _props.children,
-          multiple = _props.multiple,
-          disabled = _props.disabled;
-      var _state = this.state,
-          isDragActive = _state.isDragActive,
-          isFocused = _state.isFocused,
-          draggedFiles = _state.draggedFiles,
-          acceptedFiles = _state.acceptedFiles,
-          rejectedFiles = _state.rejectedFiles;
-
-
-      var filesCount = draggedFiles.length;
-      var isMultipleAllowed = multiple || filesCount <= 1;
-      var isDragAccept = filesCount > 0 && Object(_utils__WEBPACK_IMPORTED_MODULE_2__["allFilesAccepted"])(draggedFiles, this.props.accept);
-      var isDragReject = filesCount > 0 && (!isDragAccept || !isMultipleAllowed);
-
-      return children({
-        isDragActive: isDragActive,
-        isDragAccept: isDragAccept,
-        isDragReject: isDragReject,
-        draggedFiles: draggedFiles,
-        acceptedFiles: acceptedFiles,
-        rejectedFiles: rejectedFiles,
-        isFocused: isFocused && !disabled,
-        getRootProps: this.getRootProps,
-        getInputProps: this.getInputProps,
-        open: this.open
-      });
-    }
-  }]);
-
-  return Dropzone;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
-
-/* harmony default export */ __webpack_exports__["default"] = (Dropzone);
-
-Dropzone.propTypes = {
-  /**
-   * Allow specific types of files. See https://github.com/okonet/attr-accept for more information.
-   * Keep in mind that mime type determination is not reliable across platforms. CSV files,
-   * for example, are reported as text/plain under macOS but as application/vnd.ms-excel under
-   * Windows. In some cases there might not be a mime type set at all.
-   * See: https://github.com/react-dropzone/react-dropzone/issues/276
-   */
-  accept: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.oneOfType([prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.string, prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.arrayOf(prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.string)]),
-
-  /**
-   * Render function that renders the actual component
-   *
-   * @param {Object} props
-   * @param {Function} props.getRootProps Returns the props you should apply to the root drop container you render
-   * @param {Function} props.getInputProps Returns the props you should apply to hidden file input you render
-   * @param {Function} props.open Open the native file selection dialog
-   * @param {Boolean} props.isFocused Dropzone area is in focus
-   * @param {Boolean} props.isDragActive Active drag is in progress
-   * @param {Boolean} props.isDragAccept Dragged files are accepted
-   * @param {Boolean} props.isDragReject Some dragged files are rejected
-   * @param {Array} props.draggedFiles Files in active drag
-   * @param {Array} props.acceptedFiles Accepted files
-   * @param {Array} props.rejectedFiles Rejected files
-   */
-  children: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * Disallow clicking on the dropzone container to open file dialog
-   */
-  disableClick: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool,
-
-  /**
-   * Enable/disable the dropzone entirely
-   */
-  disabled: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool,
-
-  /**
-   * If false, allow dropped items to take over the current browser window
-   */
-  preventDropOnDocument: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool,
-
-  /**
-   * Allow dropping multiple files
-   */
-  multiple: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.bool,
-
-  /**
-   * `name` attribute for the input tag
-   */
-  name: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.string,
-
-  /**
-   * Maximum file size (in bytes)
-   */
-  maxSize: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.number,
-
-  /**
-   * Minimum file size (in bytes)
-   */
-  minSize: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.number,
-
-  /**
-   * getDataTransferItems handler
-   * @param {Event} event
-   * @returns {Array} array of File objects
-   */
-  getDataTransferItems: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onClick callback
-   * @param {Event} event
-   */
-  onClick: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onFocus callback
-   */
-  onFocus: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onBlur callback
-   */
-  onBlur: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onKeyDown callback
-   */
-  onKeyDown: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * The `onDrop` method that accepts two arguments.
-   * The first argument represents the accepted files and the second argument the rejected files.
-   *
-   * ```javascript
-   * function onDrop(acceptedFiles, rejectedFiles) {
-   *   // do stuff with files...
-   * }
-   * ```
-   *
-   * Files are accepted or rejected based on the `accept` prop.
-   * This must be a valid [MIME type](http://www.iana.org/assignments/media-types/media-types.xhtml) according to [input element specification](https://www.w3.org/wiki/HTML/Elements/input/file) or a valid file extension.
-   *
-   * Note that the `onDrop` callback will always be called regardless if the dropped files were accepted or rejected.
-   * You can use the `onDropAccepted`/`onDropRejected` props if you'd like to react to a specific event instead of the `onDrop` prop.
-   *
-   * The `onDrop` callback will provide you with an array of [Files](https://developer.mozilla.org/en-US/docs/Web/API/File) which you can then process and send to a server.
-   * For example, with [SuperAgent](https://github.com/visionmedia/superagent) as a http/ajax library:
-   *
-   * ```javascript
-   * function onDrop(acceptedFiles) {
-   *   const req = request.post('/upload')
-   *   acceptedFiles.forEach(file => {
-   *     req.attach(file.name, file)
-   *   })
-   *   req.end(callback)
-   * }
-   * ```
-   */
-  onDrop: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onDropAccepted callback
-   */
-  onDropAccepted: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onDropRejected callback
-   */
-  onDropRejected: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onDragStart callback
-   */
-  onDragStart: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onDragEnter callback
-   */
-  onDragEnter: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onDragOver callback
-   */
-  onDragOver: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * onDragLeave callback
-   */
-  onDragLeave: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func,
-
-  /**
-   * Provide a callback on clicking the cancel button of the file dialog
-   */
-  onFileDialogCancel: prop_types__WEBPACK_IMPORTED_MODULE_1___default.a.func
-};
-
-Dropzone.defaultProps = {
-  preventDropOnDocument: true,
-  disabled: false,
-  disableClick: false,
-  multiple: true,
-  maxSize: Infinity,
-  minSize: 0,
-  getDataTransferItems: _utils__WEBPACK_IMPORTED_MODULE_2__["getDataTransferItems"]
-};
-
-/***/ }),
-
-/***/ "./node_modules/react-dropzone/dist/es/utils/index.js":
-/*!************************************************************!*\
-  !*** ./node_modules/react-dropzone/dist/es/utils/index.js ***!
-  \************************************************************/
-/*! exports provided: supportMultiple, getDataTransferItems, fileAccepted, fileMatchSize, allFilesAccepted, isDragDataWithFiles, isKindFile, onDocumentDragOver, isIeOrEdge, composeEventHandlers */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "supportMultiple", function() { return supportMultiple; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getDataTransferItems", function() { return getDataTransferItems; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fileAccepted", function() { return fileAccepted; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fileMatchSize", function() { return fileMatchSize; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "allFilesAccepted", function() { return allFilesAccepted; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isDragDataWithFiles", function() { return isDragDataWithFiles; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isKindFile", function() { return isKindFile; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "onDocumentDragOver", function() { return onDocumentDragOver; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isIeOrEdge", function() { return isIeOrEdge; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "composeEventHandlers", function() { return composeEventHandlers; });
-/* harmony import */ var attr_accept__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! attr-accept */ "./node_modules/attr-accept/dist/index.js");
-/* harmony import */ var attr_accept__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(attr_accept__WEBPACK_IMPORTED_MODULE_0__);
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-
-
-var supportMultiple = typeof document !== 'undefined' && document && document.createElement ? 'multiple' in document.createElement('input') : true;
-
-function getDataTransferItems(event) {
-  var dataTransferItemsList = [];
-  if (event.dataTransfer) {
-    var dt = event.dataTransfer;
-
-    // NOTE: Only the 'drop' event has access to DataTransfer.files,
-    // otherwise it will always be empty
-    if (dt.files && dt.files.length) {
-      dataTransferItemsList = dt.files;
-    } else if (dt.items && dt.items.length) {
-      // During the drag even the dataTransfer.files is null
-      // but Chrome implements some drag store, which is accesible via dataTransfer.items
-      dataTransferItemsList = dt.items;
-    }
-  } else if (event.target && event.target.files) {
-    dataTransferItemsList = event.target.files;
-  }
-
-  // Convert from DataTransferItemsList to the native Array
-  return Array.prototype.slice.call(dataTransferItemsList);
-}
-
-// Firefox versions prior to 53 return a bogus MIME type for every file drag, so dragovers with
-// that MIME type will always be accepted
-function fileAccepted(file, accept) {
-  return file.type === 'application/x-moz-file' || attr_accept__WEBPACK_IMPORTED_MODULE_0___default()(file, accept);
-}
-
-function fileMatchSize(file, maxSize, minSize) {
-  return file.size <= maxSize && file.size >= minSize;
-}
-
-function allFilesAccepted(files, accept) {
-  return files.every(function (file) {
-    return fileAccepted(file, accept);
-  });
-}
-
-function isDragDataWithFiles(evt) {
-  if (!evt.dataTransfer) {
-    return true;
-  }
-  // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/types
-  // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/Recommended_drag_types#file
-  return Array.prototype.some.call(evt.dataTransfer.types, function (type) {
-    return type === 'Files' || type === 'application/x-moz-file';
-  });
-}
-
-function isKindFile(item) {
-  return (typeof item === 'undefined' ? 'undefined' : _typeof(item)) === 'object' && item !== null && item.kind === 'file';
-}
-
-// allow the entire document to be a drag target
-function onDocumentDragOver(evt) {
-  evt.preventDefault();
-}
-
-function isIe(userAgent) {
-  return userAgent.indexOf('MSIE') !== -1 || userAgent.indexOf('Trident/') !== -1;
-}
-
-function isEdge(userAgent) {
-  return userAgent.indexOf('Edge/') !== -1;
-}
-
-function isIeOrEdge() {
-  var userAgent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : window.navigator.userAgent;
-
-  return isIe(userAgent) || isEdge(userAgent);
-}
-
-/**
- * This is intended to be used to compose event handlers
- * They are executed in order until one of them calls `event.preventDefault()`.
- * Not sure this is the best way to do this, but it seems legit.
- * @param {Function} fns the event hanlder functions
- * @return {Function} the event handler to add to an element
- */
-function composeEventHandlers() {
-  for (var _len = arguments.length, fns = Array(_len), _key = 0; _key < _len; _key++) {
-    fns[_key] = arguments[_key];
-  }
-
-  return function (event) {
-    for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      args[_key2 - 1] = arguments[_key2];
-    }
-
-    return fns.some(function (fn) {
-      fn && fn.apply(undefined, [event].concat(args));
-      return event.defaultPrevented;
-    });
-  };
-}
-
-/***/ }),
-
 /***/ "./node_modules/react/cjs/react.development.js":
 /*!*****************************************************!*\
   !*** ./node_modules/react/cjs/react.development.js ***!
@@ -67872,6 +66351,8 @@ __webpack_require__(/*! ./components/Maps */ "./resources/js/components/Maps.js"
 
 __webpack_require__(/*! ./components/TravelSiteForm */ "./resources/js/components/TravelSiteForm.js");
 
+__webpack_require__(/*! ./components/TravelSite */ "./resources/js/components/TravelSite.js");
+
 /***/ }),
 
 /***/ "./resources/js/bootstrap.js":
@@ -67929,6 +66410,19 @@ if (token) {
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     encrypted: true
 // });
+
+/***/ }),
+
+/***/ "./resources/js/components/BaseURL.js":
+/*!********************************************!*\
+  !*** ./resources/js/components/BaseURL.js ***!
+  \********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = (document.querySelector('meta[name="base-url"]').content);
 
 /***/ }),
 
@@ -68339,6 +66833,247 @@ if (document.getElementById('homemap')) {
 
 /***/ }),
 
+/***/ "./resources/js/components/TravelSite.js":
+/*!***********************************************!*\
+  !*** ./resources/js/components/TravelSite.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TravelSite; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _BaseURL__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./BaseURL */ "./resources/js/components/BaseURL.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+
+
+
+
+
+var TravelSite =
+/*#__PURE__*/
+function (_Component) {
+  _inherits(TravelSite, _Component);
+
+  function TravelSite(props) {
+    var _this;
+
+    _classCallCheck(this, TravelSite);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TravelSite).call(this, props));
+    _this.state = {
+      sites: [],
+      page: 1,
+      last_page: 2,
+      q: ''
+    };
+    _this.getSites = _this.getSites.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.trackScreen = _this.trackScreen.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.onSearch = _this.onSearch.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.onSubmit = _this.onSubmit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(TravelSite, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.getSites();
+      document.addEventListener('scroll', this.trackScreen);
+    }
+  }, {
+    key: "trackScreen",
+    value: function trackScreen(ev) {
+      var _this2 = this;
+
+      var scroll = ev.target.scrollingElement; // console.log(`client height : ${scroll.clientHeight}` , scroll.scrollHeight - scroll.scrollTop);
+
+      if (scroll.clientHeight === scroll.scrollHeight - scroll.scrollTop) {
+        this.setState(function (_ref) {
+          var page = _ref.page,
+              last_page = _ref.last_page;
+          page === last_page ? page = last_page : page++;
+          return {
+            page: page
+          };
+        }, function () {
+          return _this2.getSites();
+        });
+      }
+    }
+  }, {
+    key: "getSites",
+    value: function getSites() {
+      var _this3 = this;
+
+      var _this$state = this.state,
+          pageParams = _this$state.page,
+          q = _this$state.q;
+      Object(axios__WEBPACK_IMPORTED_MODULE_2__["get"])('/dashboard/travel-site', {
+        params: {
+          page: pageParams,
+          q: q
+        }
+      }).then(function (resp) {
+        return _this3.setState(function (_ref2) {
+          var sites = _ref2.sites,
+              last_page = _ref2.last_page,
+              page = _ref2.page;
+          console.log(page === last_page ? 'last page' : "page ".concat(page));
+          return page === last_page ? {
+            sites: _toConsumableArray(resp.data.data),
+            last_page: resp.data.last_page
+          } : {
+            sites: [].concat(_toConsumableArray(sites), _toConsumableArray(resp.data.data)),
+            last_page: resp.data.last_page
+          };
+        });
+      });
+    }
+  }, {
+    key: "deleteSite",
+    value: function deleteSite(id) {
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.delete("".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/dashboard/travel-site/").concat(id)).then(function (resp) {
+        return console.log(resp);
+      }).catch(function (err) {
+        return console.log(err);
+      });
+    }
+  }, {
+    key: "onSearch",
+    value: function onSearch(ev) {
+      this.setState({
+        q: ev.target.value,
+        sites: [],
+        page: 1
+      }, this.getSites);
+    }
+  }, {
+    key: "onSubmit",
+    value: function onSubmit(ev) {
+      ev.preventDefault();
+      this.getSites();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var sites = this.state.sites;
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "d-flex flex-row justify-content-between align-items-center"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
+        className: "m-0"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+        className: "fa fa-map-marker fa-lg"
+      }), "\xA0Tempat Wisata | ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+        href: "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/dashboard/tempat-wisata/create"),
+        className: "btn btn-outline-success btn-sm"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+        className: "fa fa-plus-square fa-fw"
+      }), "\xA0Tambah tempat wisata")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
+        onSubmit: this.onSubmit,
+        action: "",
+        method: "get"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "input-group"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        name: "q",
+        value: this.state.q,
+        onChange: this.onSearch,
+        type: "text",
+        placeholder: "Cari tempat wisata",
+        className: "form-control"
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "input-group-append"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        className: "btn btn-dark"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+        className: "fa fa-search fa-lg"
+      })))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-columns",
+        onScroll: this.trackScreen
+      }, sites.map(function (site, i) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          key: i,
+          className: "card"
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+          src: "/storage/img/".concat(site.site_pictures[0].photo),
+          alt: site.name,
+          title: site.name,
+          className: "card-img-top"
+        }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          className: "card-body"
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
+          className: "m-0"
+        }, site.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+          className: "text-muted small"
+        }, site.site_type.name, " | ", site.travel_type.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+          className: "m-0 text-truncate"
+        }, site.description), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+          href: "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/dashboard/tempat-wisata/").concat(site.id, "/edit"),
+          className: "btn btn-warning btn-sm",
+          "data-toggle": "tooltip",
+          "data-placement": "top",
+          title: "Edit ".concat(site.name)
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+          className: "fa fa-edit fa-lg"
+        })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+          href: "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/dashboard/tempat-wisata/").concat(site.id),
+          className: "btn btn-danger btn-sm",
+          title: "Hapus ".concat(site.name, " ?")
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+          className: "fa fa-remove fa-lg"
+        })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+          href: "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/dashboard/tempat-wisata/").concat(site.id),
+          className: "btn btn-primary btn-sm",
+          title: "Preview ".concat(site.name)
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+          className: "fa fa-eye fa-lg"
+        }))));
+      })));
+    }
+  }]);
+
+  return TravelSite;
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]);
+
+
+
+if (document.getElementById('travel-site')) {
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TravelSite, null), document.getElementById('travel-site'));
+}
+
+/***/ }),
+
 /***/ "./resources/js/components/TravelSiteForm.js":
 /*!***************************************************!*\
   !*** ./resources/js/components/TravelSiteForm.js ***!
@@ -68349,25 +67084,15 @@ if (document.getElementById('homemap')) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TravelSiteForm", function() { return TravelSiteForm; });
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
-/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _FormMap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./FormMap */ "./resources/js/components/FormMap.js");
-/* harmony import */ var react_dropzone__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-dropzone */ "./node_modules/react-dropzone/dist/es/index.js");
-
-
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _FormMap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FormMap */ "./resources/js/components/FormMap.js");
+/* harmony import */ var _UploadingModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./UploadingModal */ "./resources/js/components/UploadingModal.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
-
-function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -68391,7 +67116,6 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 
 
 
- // import { fdatasync } from 'fs';
 
 var TravelSiteForm =
 /*#__PURE__*/
@@ -68414,11 +67138,13 @@ function (_Component) {
       latitude: 0,
       longitude: 0,
       types: [],
-      errors: []
+      errors: [],
+      progress: 0
     };
     _this.getTypes = _this.getTypes.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.onChange = _this.onChange.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.onFileSelected = _this.onFileSelected.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.onFileSelect = _this.onFileSelect.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.postData = _this.postData.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.convertFile = _this.convertFile.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
@@ -68429,7 +67155,7 @@ function (_Component) {
     value: function getTypes() {
       var _this2 = this;
 
-      axios__WEBPACK_IMPORTED_MODULE_3___default.a.get('/api/types').then(function (resp) {
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/types').then(function (resp) {
         _this2.setState({
           types: resp.data
         });
@@ -68475,83 +67201,74 @@ function (_Component) {
       });
     }
   }, {
+    key: "onFileSelect",
+    value: function onFileSelect(ev) {
+      var _this3 = this;
+
+      this.setState({
+        photo: ev.target.files[0],
+        files: Object.assign(ev.target.files[0], {
+          preview: URL.createObjectURL(ev.target.files[0])
+        })
+      }, function () {
+        return console.log(_this3.state.files);
+      });
+    }
+  }, {
     key: "postData",
-    value: function () {
-      var _postData = _asyncToGenerator(
-      /*#__PURE__*/
-      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(ev) {
-        var _this$state, name, address, description, travel_type_id, longitude, latitude, photo, FD, i;
+    value: function postData(ev) {
+      var _this4 = this;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _this$state = this.state, name = _this$state.name, address = _this$state.address, description = _this$state.description, travel_type_id = _this$state.travel_type_id, longitude = _this$state.longitude, latitude = _this$state.latitude, photo = _this$state.photo;
-                ev.preventDefault();
-                FD = new FormData();
+      var _this$state = this.state,
+          name = _this$state.name,
+          address = _this$state.address,
+          description = _this$state.description,
+          travel_type_id = _this$state.travel_type_id,
+          longitude = _this$state.longitude,
+          latitude = _this$state.latitude,
+          photo = _this$state.photo;
+      ev.preventDefault();
+      var FD = new FormData();
+      FD.append('photo', photo);
+      FD.append('name', name);
+      FD.append('address', address);
+      FD.append('description', description);
+      FD.append('travel_type_id', travel_type_id);
+      FD.append('longitude', longitude);
+      FD.append('latitude', latitude); // try {
 
-                for (i = 0; i < photo.length; i++) {
-                  // console.log(Array.from(photo)[0]);
-                  FD.append('photo[]', photo[i], photo[i].name);
-                }
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.post('/dashboard/tempat-wisata/', FD, {
+        onUploadProgress: function onUploadProgress(progress) {
+          return _this4.setState({
+            progress: Math.round(progress.loaded * 100 / progress.total)
+          });
+        },
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(function (resp) {
+        _this4.uploadModal.openModal();
 
-                FD.append('name', name);
-                FD.append('address', address);
-                FD.append('description', description);
-                FD.append('travel_type_id', travel_type_id);
-                FD.append('longitude', longitude);
-                FD.append('latitude', latitude);
-                _context.prev = 10;
-                _context.next = 13;
-                return axios__WEBPACK_IMPORTED_MODULE_3___default.a.post('/dashboard/tempat-wisata/', FD, {
-                  headers: {
-                    'Content-Type': 'multipart/form-data'
-                  }
-                });
-
-              case 13:
-                resp = _context.sent;
-                console.log(resp.status); // if (resp.status === 422)
-                // {
-                // } else {
-
-                this.setState({
-                  name: '',
-                  address: '',
-                  description: '',
-                  travel_type_id: '',
-                  photo: []
-                }); // }
-
-                _context.next = 21;
-                break;
-
-              case 18:
-                _context.prev = 18;
-                _context.t0 = _context["catch"](10);
-                // console.log(error.response.data.errors)
-                this.setState({
-                  errors: _context.t0.response.data.errors
-                });
-
-              case 21:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this, [[10, 18]]);
-      }));
-
-      function postData(_x) {
-        return _postData.apply(this, arguments);
-      }
-
-      return postData;
-    }()
+        if (resp.data.site) _this4.setState({
+          name: '',
+          address: '',
+          description: '',
+          travel_type_id: '',
+          files: [],
+          photo: []
+        }, function () {
+          return _this4.fileInput.value = '';
+        });
+      }).catch(function (error) {
+        return _this4.setState({
+          errors: error.response.data.errors
+        });
+      });
+    }
   }, {
     key: "render",
     value: function render() {
-      var _this3 = this;
+      var _this5 = this;
 
       var _this$state2 = this.state,
           name = _this$state2.name,
@@ -68594,30 +67311,18 @@ function (_Component) {
         width: 'auto',
         height: '100%'
       };
-      var imgs = this.state.files.map(function (file, i) {
-        return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-          style: thumb,
-          key: i
-        }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
-          style: thumbInner
-        }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("img", {
-          src: file.preview,
-          style: img,
-          alt: ""
-        })));
-      });
-      return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_1__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("form", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
         action: "",
         encType: "multipart/form-data",
         method: "post"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
         htmlFor: "",
         className: "control-label mb-1 mt-1"
-      }, "Nama tempat wisata"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }, "Nama tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "text",
         onChange: this.onChange,
         value: name,
@@ -68625,13 +67330,13 @@ function (_Component) {
         placeholder: "Nama tempat wisata",
         className: errors.name ? "form-control is-invalid" : "form-control"
       }), errors.name ? errors.name.map(function (error) {
-        return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
           className: "invalid-feedback"
         }, error);
-      }) : '', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
         htmlFor: "",
         className: "control-label mb-1 mt-1"
-      }, "Alamat tempat wisata"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", {
+      }, "Alamat tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
         type: "text",
         onChange: this.onChange,
         value: address,
@@ -68639,33 +67344,33 @@ function (_Component) {
         placeholder: "Alamat tempat wisata",
         className: errors.address ? "form-control is-invalid" : "form-control"
       }), errors.address ? errors.address.map(function (error) {
-        return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
           className: "invalid-feedback"
         }, error);
-      }) : '', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
         htmlFor: "",
         className: "control-label mb-1 mt-1"
-      }, "Tipe wisata"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("select", {
+      }, "Tipe wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
         name: "travel_type_id",
         onChange: this.onChange,
         value: travel_type_id,
         id: "",
         className: errors.travel_type_id ? "form-control is-invalid" : "form-control"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("option", {
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
         value: ""
       }, "Pilih tipe wisata"), this.state.types.map(function (type, i) {
-        return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("option", {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
           key: i,
           value: type.id
         }, type.name);
       })), errors.travel_type_id ? errors.travel_type_id.map(function (error) {
-        return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
           className: "invalid-feedback"
         }, error);
-      }) : '', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
         htmlFor: "",
         className: "control-label mb-1 mt-1"
-      }, "Deskripsi tempat wisata"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("textarea", {
+      }, "Deskripsi tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("textarea", {
         name: "description",
         onChange: this.onChange,
         value: description,
@@ -68673,51 +67378,182 @@ function (_Component) {
         placeholder: "Deskripsi",
         className: errors.description ? "form-control is-invalid" : "form-control"
       }), errors.description ? errors.description.map(function (error) {
-        return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("span", {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
           className: "invalid-feedback"
         }, error);
-      }) : '', react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("label", {
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
         htmlFor: "",
         className: "control-label mb-1 mt-1"
-      }, "Gambar tempat wisata"), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(react_dropzone__WEBPACK_IMPORTED_MODULE_5__["default"], {
-        accept: ["image/jpg", "image/jpeg", "image/png"],
-        onDropAccepted: this.onFileSelected,
-        multiple: true
-      }, function (_ref) {
-        var getRootProps = _ref.getRootProps,
-            getInputProps = _ref.getInputProps;
-        return react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", _extends({
-          style: baseStyle
-        }, getRootProps()), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("input", getInputProps()), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("h1", null, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("i", {
-          className: "fa fa-file fa-lg"
-        })), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("p", {
-          className: "m-0 text-muted"
-        }, _this3.state.photo.length, " file"), imgs);
-      }), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("button", {
+      }, "Gambar tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        type: "file",
+        name: "photo",
+        id: "",
+        onChange: this.onFileSelect,
+        key: function key(ref) {
+          return _this5.fileInput = ref;
+        },
+        multiple: false,
+        accept: ['image/jpg', 'image/jpeg', 'image/png'],
+        className: "form-control"
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "submit",
         onClick: this.postData,
         className: "btn btn-outline-success btn-sm"
-      }, "Buat"))), react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement("div", {
+      }, "Buat"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
-      }, react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(_FormMap__WEBPACK_IMPORTED_MODULE_4__["default"], {
-        onCoordChange: function onCoordChange(_ref2) {
-          var latitude = _ref2.latitude,
-              longitude = _ref2.longitude;
-          return _this3.setState({
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_FormMap__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        onCoordChange: function onCoordChange(_ref) {
+          var latitude = _ref.latitude,
+              longitude = _ref.longitude;
+          return _this5.setState({
             latitude: latitude,
             longitude: longitude
           });
         }
-      }))));
+      }), this.state.files.length !== 0 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+        src: this.state.files.preview,
+        alt: "",
+        className: "img-fluid img-thumbnail my-2"
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UploadingModal__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        ref: function ref(_ref2) {
+          return _this5.uploadModal = _ref2;
+        },
+        progress: this.state.progress
+      }));
     }
   }]);
 
   return TravelSiteForm;
-}(react__WEBPACK_IMPORTED_MODULE_1__["Component"]);
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]);
 
 if (document.getElementById('travel-form')) {
-  react_dom__WEBPACK_IMPORTED_MODULE_2___default.a.render(react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement(TravelSiteForm, null), document.getElementById('travel-form'));
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TravelSiteForm, null), document.getElementById('travel-form'));
 }
+
+/***/ }),
+
+/***/ "./resources/js/components/UploadingModal.js":
+/*!***************************************************!*\
+  !*** ./resources/js/components/UploadingModal.js ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return UploadingModal; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+
+
+var UploadingModal =
+/*#__PURE__*/
+function (_Component) {
+  _inherits(UploadingModal, _Component);
+
+  function UploadingModal(props) {
+    var _this;
+
+    _classCallCheck(this, UploadingModal);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(UploadingModal).call(this, props));
+    _this.state = {
+      progressClass: "progress-bar progress-bar-striped bg-danger"
+    };
+    _this.openModal = _this.openModal.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.closeModal = _this.closeModal.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(UploadingModal, [{
+    key: "openModal",
+    value: function openModal() {
+      $('#uploading').modal('show');
+    }
+  }, {
+    key: "closeModal",
+    value: function closeModal() {
+      $('#uploading').modal('hide');
+    }
+  }, {
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(nextProps) {
+      var progress = nextProps.progress;
+      var progressClass = this.state;
+
+      if (progress < 30) {
+        progressClass = "progress-bar progress-bar-striped bg-danger";
+      } else if (progress < 55) {
+        progressClass = "progress-bar progress-bar-striped bg-warning";
+      } else if (progress < 100) {
+        progressClass = "progress-bar progress-bar-striped bg-success";
+      } else if (progress === 100) {
+        progressClass = "progress-bar progress-bar-striped bg-primary";
+      }
+
+      this.setState({
+        progressClass: progressClass
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "modal fade",
+        "data-backdrop": "static",
+        "data-keyboard": false,
+        id: "uploading"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "modal-dialog"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "modal-content"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "modal-header"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+        className: "modal-title m-0"
+      }, "Sedang mengupload")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "modal-body"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "progress",
+        style: {
+          height: 15
+        }
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        style: {
+          width: "".concat(this.props.progress, "%")
+        },
+        className: this.state.progressClass
+      }, "".concat(this.props.progress, "%")))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "modal-footer"
+      }, this.props.progress === 100 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        "data-dismiss": "modal",
+        className: "btn btn-outline-primary btn-sm"
+      }, "Tutup")))));
+    }
+  }]);
+
+  return UploadingModal;
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]);
+
+
 
 /***/ }),
 
@@ -68739,8 +67575,8 @@ if (document.getElementById('travel-form')) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\xampp\htdocs\dispar\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! C:\xampp\htdocs\dispar\resources\sass\app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /Applications/XAMPP/xamppfiles/htdocs/dispar/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /Applications/XAMPP/xamppfiles/htdocs/dispar/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
