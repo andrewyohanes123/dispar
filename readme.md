@@ -2,8 +2,8 @@
 
 ### Dependencies
 Before you can install this project smoothly, you must install :
-- Composer (Latest)
-- NodeJS (LTS Version)
+- [Composer](https://getcomposer.org) (Latest)
+- [NodeJS](https://nodejs.org) (LTS Version)
 
 ### How to install
 Go to the project's root directory and type
