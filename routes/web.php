@@ -23,6 +23,7 @@ Route::get('/berita/{year}/{month}/{slug}', 'RootController@show_news')->name('r
 Route::get('/tempat-wisata', 'SiteController@index')->name('root.sites');
 Route::get('/tempat-wisata/{slug}', 'SiteController@show')->name('root.site-show');
 Route::get('/gallery', 'GalleryController@index')->name('root.galleries');
+Route::get('/fasilitas/{nama}', 'FacilityController@index')->name('root.facilities');
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
   Route::get('/main', function () {
@@ -36,7 +37,12 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
   })->name('dashboard.main');
   Route::resource('berita', 'NewsController');
   Route::resource('tempat-wisata', 'TravelSiteController');
+  Route::resource('fasilitas-wisata', 'FacilitiesController');
+  Route::resource('kalender-kegiatan', 'EventCalendarController');
   Route::redirect('/', '/dashboard/main', 301);
-  
   Route::get('/travel-site', 'SiteControllerAPI@index');
+});
+
+Route::match(['get', 'post'], 'register', function(){
+  return redirect('/');
 });

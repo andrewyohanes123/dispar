@@ -10,16 +10,23 @@
         }
     </style>
     <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,600,800" rel="stylesheet">
+@endsection
+
+@section('banner')
+    <div id="banner" class="vh-100 w-100 o-hidden">
+        <div class="banner w-100 vh-100" style="background-image: url(https://jacksonmahino.files.wordpress.com/2015/08/img20150715042224.jpg); background-size:cover;background-position:bottom;">
+            <p class="m-0">Dinas <span>Pariwisata</span></p>
+            <h4 class="m-0">Kota Manado</h4>
+            {{-- <img src="https://jacksonmahino.files.wordpress.com/2015/08/img20150715042224.jpg" class="w-100" alt=""> --}}
+            <h1 class="slide"><i class="fa fa-angle-down fa-lg"></i></h1>
+        </div>
+    </div>
 @endsection
 
 @section('content')
     <div class="card o-hidden p-relative">
-        {{-- <div class="card-header">
-            <p class="m-0 text-muted">Tempat Wisata</p>
-        </div> --}}
         <div id="homemap"></div>
-        {{-- <div class="card-body">
-        </div> --}}
     </div>
     @include('home.menu')
     <div class="row mt-3 mb-3">
@@ -48,6 +55,14 @@
 @endsection
 
 @section('script')
+    <script>
+        $(document).ready(function(){
+            $('.slide').click(function(){
+                $('#banner').css('animation', 'slide-cover 750ms forwards');
+                $('#banner').slideUp();
+            });
+        });
+    </script>
     {{-- <script>
             // Initialize and add the map
             function initMap() {

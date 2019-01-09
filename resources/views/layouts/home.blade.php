@@ -9,10 +9,11 @@
     <title>@yield('title')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="base-url" content="{{ url('/') }}">
+    <link href="https://fonts.googleapis.com/css?family=Staatliches" rel="stylesheet">
     @yield('style')
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top p-0">
+    <nav class="navbar navbar-expand-lg navbar-light navbar-laravel fixed-top p-0">
         <a href="/" class="navbar-brand p-2">{{ config('app.name') }}</a>
         <button class="navbar-toggler" data-collapse="collapse" data-target="#menu"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="menu">
@@ -20,6 +21,14 @@
                 <li class="nav-item {{ (Route::current()->getName() === 'root') ? 'active' : '' }}"><a href="{{ route('root') }}" class="nav-link">Beranda</a></li>
                 <li class="nav-item {{ (Route::current()->getName() === 'root.news') ? 'active' : '' }}"><a href="{{ route('root.news') }}" class="nav-link">Berita</a></li>
                 <li class="nav-item {{ (Route::current()->getName() === 'root.sites') ? 'active' : '' }}"><a href="{{ route('root.sites') }}" class="nav-link">Tempat Wisata</a></li>
+                <li class="nav-item dropdown {{ (Route::current()->getName() === 'root.sites') ? 'active' : '' }}">
+                    <a href="#" id="dropdown" class="nav-link dropdown-toggle" data-toggle="dropdown">Fasilitas</a>
+                    <div class="dropdown-menu">
+                        @foreach ($facility as $item)
+                            <a href="{{ route('root.facilities', ['nama' => str_slug(strtolower($item->name))]) }}" class="dropdown-item">{{ $item->name }}</a>
+                        @endforeach
+                    </div>
+                </li>
                 <li class="nav-item {{ (Route::current()->getName() === 'root.galleries') ? 'active' : '' }}"><a href="{{ route('root.galleries') }}" class="nav-link">Gallery</a></li>
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -32,6 +41,7 @@
         </div>
     </nav>
     <div class="mt-4">
+        @yield('banner')
         <div class="container pt-5">
             @yield('content')
         </div>

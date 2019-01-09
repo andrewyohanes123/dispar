@@ -30,7 +30,8 @@
             <li class="nav-item"><a href="{{ route('dashboard.main') }}" class="nav-link {{ (Route::current()->getName() === 'dashboard.main') ? 'active' : '' }}"><i class="fa fa-dashboard fa-md"></i>&nbsp;Dashboard</a></li>
             <li class="nav-item"><a href="{{ route('berita.index') }}" class="nav-link {{ (Route::current()->getName() === 'berita.index') ? 'active' : '' }}"><i class="fa fa-newspaper-o fa-md"></i>&nbsp;Berita</a></li>
             <li class="nav-item"><a href="{{ route('tempat-wisata.index') }}" class="nav-link {{ (Route::current()->getName() === 'tempat-wisata.index') ? 'active' : '' }}"><i class="fa fa-map-marker fa-md"></i>&nbsp;Tempat Wisata</a></li>
-            <li class="nav-item"><a href="{{ route('tempat-wisata.index') }}" class="nav-link {{ (Route::current()->getName() === 'tempat-wisata.index') ? 'active' : '' }}"><i class="fa fa-building-o fa-md"></i>&nbsp;Fasilitas Wisata</a></li>
+            <li class="nav-item"><a href="{{ route('fasilitas-wisata.index') }}" class="nav-link {{ (Route::current()->getName() === 'fasilitas-wisata.index') ? 'active' : '' }}"><i class="fa fa-building-o fa-md"></i>&nbsp;Fasilitas Wisata</a></li>
+            <li class="nav-item"><a href="{{ route('kalender-kegiatan.index') }}" class="nav-link {{ (Route::current()->getName() === 'kalender-kegiatan.index') ? 'active' : '' }}"><i class="fa fa-calendar fa-md"></i>&nbsp;Kalender Kegiatan</a></li>
           </ul>
           <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
             <a id="logout-btn" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="#"><i class="fa fa-sign-out fa-md text-muted"></i>&nbsp;Logout</a>
@@ -53,6 +54,6 @@
   <script src="{{ asset('js/flatpickr') }}"></script>  
   <script src="{{ asset('js/summernote-bs4.js') }}" defer></script>    
   <script src="{{ asset('js/main.js') }}" defer></script>    
-  {{-- @yield('scripts') --}}
+  @yield('scripts')
 </body>
 </html>

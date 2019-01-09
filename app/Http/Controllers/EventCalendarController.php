@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use \App\EventCalendar;
 
-use App\SitePicture;
-
-class GalleryController extends Controller
+class EventCalendarController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,9 +14,8 @@ class GalleryController extends Controller
      */
     public function index()
     {
-        $picts = SitePicture::orderBy('id', 'ASC')->paginate(9);
-        $facility = \App\SiteType::whereNotIn('id', [5])->get();
-        return view('home.galleries', compact('picts', 'facility'));
+        $events = EventCalendar::all();
+        return view('dashboard.events', compact('events'));
     }
 
     /**

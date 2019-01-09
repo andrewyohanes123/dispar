@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $('#news-content').summernote({
+  $('#visi').summernote({
     placeholder : 'Isi berita',
     height : 200
   });
@@ -20,5 +20,15 @@ $(document).ready(function () {
   $('.hapus-berita').click(function(ev){
     ev.preventDefault();
     $(this).siblings('form').submit();
-  })
+  });
+
+  $('#tambah-fasilitas').click(function(ev){
+    ev.preventDefault();
+    $('#facility').html($('input[name="facility[]"]').addClass('mb-1 mt-1').clone());
+    return false;
+  });
+
+  $('.slide').click(function(){
+    $('#banner').slideUp();
+  });
 });

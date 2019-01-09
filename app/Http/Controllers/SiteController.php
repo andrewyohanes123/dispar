@@ -11,12 +11,14 @@ class SiteController extends Controller
     {
         $sites = Site::where('site_type_id', 5)->paginate(6);
         if ($request->q) $sites = Site::search($request->q)->where('site_type_id', 5)->paginate(6);
-        return view('home.travel', compact('sites'));
+        $facility = \App\SiteType::whereNotIn('id', [5])->get();
+        return view('home.travel', compact('sites', 'facility'));
     }
 
     public function show($slug)
     {
         $site = Site::where('site_type_id', 5)->where('slug', $slug)->first();
-        return view('home.travel-show', compact('site'));
+        $facility = \App\SiteType::whereNotIn('id', [5])->get();
+        return view('home.travel-show', compact('site', 'facility'));
     }
 }

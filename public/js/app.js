@@ -66605,6 +66605,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var google_maps_react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(google_maps_react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _BaseURL__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./BaseURL */ "./resources/js/components/BaseURL.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -66622,6 +66623,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 
 
 
@@ -66650,6 +66652,9 @@ function (_Component) {
       place: {
         name: "",
         travel_type: {
+          name: ""
+        },
+        site_type: {
           name: ""
         }
       },
@@ -66698,6 +66703,26 @@ function (_Component) {
       }
     }
   }, {
+    key: "iconDeterminer",
+    value: function iconDeterminer(loc) {
+      if (loc.site_type.name === 'Restoran') {
+        return 'http://maps.google.com/mapfiles/ms/micons/restaurant.png';
+      } else if (loc.site_type.name === 'Market') {
+        return 'http://maps.google.com/mapfiles/ms/micons/convienancestore.png';
+      } else if (loc.site_type.name === 'Hotel') {
+        return "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/icons/hotel.svg");
+      } else if (loc.site_type.name === 'Travel Guide') {
+        return "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/icons/airplane-shape.svg");
+      } else if (loc.site_type.name === 'Objek Wisata' && loc.travel_type.name === 'Wisata Alam') {
+        return 'http://maps.google.com/mapfiles/ms/micons/geographic_features.png';
+      } else if (loc.site_type.name === 'Objek Wisata' && loc.travel_type.name === 'Wisata Kuliner') {
+        return 'http://maps.google.com/mapfiles/ms/micons/convienancestore.png';
+      } else if (loc.site_type.name === 'Objek Wisata' && loc.travel_type.name === 'Wisata Religi') {
+        return "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/icons/building.svg");
+      } // return loc;
+
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this3 = this;
@@ -66726,6 +66751,11 @@ function (_Component) {
         return (// <React.Fragment>
           react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(google_maps_react__WEBPACK_IMPORTED_MODULE_1__["Marker"], {
             title: marker.site_type.name,
+            icon: {
+              url: _this3.iconDeterminer(marker),
+              anchor: new google.maps.Point(32, 32),
+              scaledSize: new google.maps.Size(30, 30)
+            },
             onClick: function onClick(props, point) {
               return _this3.onMarkerClick(marker, point);
             },
@@ -66747,7 +66777,7 @@ function (_Component) {
         className: "m-0"
       }, this.state.place.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         className: "m-0 small text-muted"
-      }, this.state.place.travel_type.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+      }, this.state.place.travel_type !== null ? this.state.place.travel_type.name : this.state.place.site_type.name), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
         className: "m-0"
       }, this.state.place.address)))));
     }

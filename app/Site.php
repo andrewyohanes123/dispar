@@ -38,4 +38,9 @@ class Site extends Model
     {
         return $this->hasMany('App\SitePicture');
     }
+
+    public function facilities()
+    {
+        return $this->hasMany('App\Facility');
+    }
 }

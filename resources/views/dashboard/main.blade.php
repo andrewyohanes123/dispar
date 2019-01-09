@@ -70,40 +70,47 @@
         <div class="col-12">
           <hr>
         </div>
-        <div class="col-md-6 mt-1 mb-2">
-          <div class="card o-hidden">
-            <div class="card-header o-hidden d-flex flex-row justify-content-between align-items-center">
-              <p class="m-0 card-title d-inline-block"><i class="fa fa-info-circle fa-lg"></i>&nbsp;Info Halaman Utama</p>
-              <button class="btn btn-outline-success btn-sm d-inline-block"><i class="fa fa-edit fa-fw"></i>&nbsp;Ganti info</button>
-            </div>
-            <div class="card-body">
-              <h4>{{ $info->name }}</h4>
-              <p class="text-justify">{{ str_limit($info->content, 90) }}</p>
-            </div>
+      </div>
+      <div class="card-columns columns-2">
+        <div class="card o-hidden">
+          <div class="card-header o-hidden d-flex flex-row justify-content-between align-items-center">
+            <p class="m-0 card-title d-inline-block"><i class="fa fa-info-circle fa-lg"></i>&nbsp;Info Halaman Utama</p>
+            <button class="btn btn-outline-success btn-sm d-inline-block"><i class="fa fa-edit fa-fw"></i>&nbsp;Ganti info</button>
+          </div>
+          <div class="card-body">
+            <h4>{{ $info->name }}</h4>
+            <p class="text-justify">{{ str_limit($info->content, 90) }}</p>
           </div>
         </div>
-        <div class="col-md-6 mt-1 mb-2">
-          <div class="card">
-            <div class="card-header o-hidden d-flex flex-row justify-content-between align-items-center">
-                <p class="m-0 card-title d-inline-block"><i class="fa fa-bar-chart-o fa-lg"></i>&nbsp;Pengunjung</p>
-            </div>
-            <div class="card-body">
-              Pengunjung Banyak
-            </div>
+        {{--  --}}
+        <div class="card">
+          <div class="card-header o-hidden d-flex flex-row justify-content-between align-items-center">
+              <p class="m-0 card-title d-inline-block"><i class="fa fa-bar-chart-o fa-lg"></i>&nbsp;Pengunjung</p>
+          </div>
+          <div class="card-body">
+            Pengunjung Banyak
           </div>
         </div>
-        <div class="col-md-8 mt-1 mb-2">
-          <div class="card">
-            <div class="card-header o-hidden d-flex flex-row justify-content-between align-items-center">
-                <p class="m-0 card-title d-inline-block"><i class="fa fa-picture-o fa-lg"></i>&nbsp;Banner</p>
+        {{--  --}}
+        <div class="card">
+          <div class="card-header o-hidden d-flex flex-row justify-content-between align-items-center">
+              <p class="m-0 card-title d-inline-block"><i class="fa fa-picture-o fa-lg"></i>&nbsp;Cover</p>
+          </div>
+          @if (count($banner) > 0)
+            <img src="{{ asset('/storage/img' . $banner) }}" alt="" class="card-img rounded-0">
+          @else
+            <div class="card-body">
+              <h4 class="text-center m-0">Belum ada cover</h4>
             </div>
-            @if (count($banner))
-              <img src="{{ asset('/storage/img' . $banner) }}" alt="" class="card-img rounded-0">
-            @else
-              <div class="card-body">
-                <h4 class="text-center m-0">Belum ada banner</h4>
-              </div>
-            @endif
+          @endif
+        </div>
+        {{--  --}}
+        <div class="card">
+          <div class="card-body">
+            <p class="m-0"><i class="fa fa-bookmark-o fa-lg"></i>&nbsp;Visi Misi</p>
+          </div>
+          <textarea name="" id="visi" cols="30" rows="10"></textarea>
+          <div class="card-body">
           </div>
         </div>
       </div>

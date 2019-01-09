@@ -22,20 +22,23 @@ class RootController extends Controller
         setLocale(LC_ALL, 'IND');
         $news = News::orderBy('id', 'ASC')->paginate(5);
         $note = Note::latest()->first();
-        return view('home.main', compact('news', 'note'));
+        $facility = \App\SiteType::whereNotIn('id', [5])->get();
+        return view('home.main', compact('news', 'note', 'facility'));
     }
 
     public function news(Request $request)
     {
         $news = News::orderBy('created_at', 'DESC')->paginate(9);
+        $facility = \App\SiteType::whereNotIn('id', [5])->get();
         if ($request->q) $news = News::search($request->q)->orderBy('created_at', 'DESC')->paginate(9);
-        return view('home.news', compact('news'));
+        return view('home.news', compact('news', 'facility'));
     }
 
     public function show_news($year, $month, $slug)
     {
         $news = News::where('slug', $slug)->whereMonth('created_at', $month)->whereYear('created_at', $year)->get()->first();
-        return view('home.news-show', compact('news'));
+        $facility = \App\SiteType::whereNotIn('id', [5])->get();
+        return view('home.news-show', compact('news', 'facility'));
     }
 
     /**
