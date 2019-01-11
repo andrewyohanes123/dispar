@@ -17,3 +17,4 @@ require('./components/Example');
 require('./components/Maps');
 require('./components/TravelSiteForm');
 require('./components/TravelSite');
+require('./components/TravelSiteEdit');

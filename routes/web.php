@@ -40,6 +40,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
   Route::post('/visi-misi', 'PointsController@store')->name('dashboard.point');
   Route::resource('berita', 'NewsController');
   Route::resource('tempat-wisata', 'TravelSiteController');
+  Route::get('/tempat-wisata/{id}/api', 'TravelSiteController@api');
   Route::resource('fasilitas-wisata', 'FacilitiesController');
   Route::resource('kalender-kegiatan', 'EventCalendarController');
   Route::redirect('/', '/dashboard/main', 301);

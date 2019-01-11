@@ -15,7 +15,7 @@
     <hr>
     <div class="card-columns">
       @foreach ($news as $item)
-          <div class="card shadow-sm">
+          <div class="card border-0 my-2 anim shadow-sm">
             <a href="{{ route('root.show-news', ['slug' => $item->slug, 'year' => $item->created_at->format('Y'), 'month' => $item->created_at->format('m')]) }}"><img src="{{ asset('storage/img/'. $item->hero_img) }}" class="card-img-top" alt=""></a>
             <div class="card-body">
               <h5 class="m-0"><a href="{{ route('root.show-news', ['slug' => $item->slug, 'year' => $item->created_at->format('Y'), 'month' => $item->created_at->format('m')]) }}">{{ $item->title }}</a></h5>
@@ -29,4 +29,15 @@
     <div class="d-flex flex-row justify-content-center align-items-center mb-5">
       {{ $news->appends(request()->q)->links() }}
     </div>
+@endsection
+@section('script')
+    <script>
+      $(document).ready(function(){
+        $('div.anim').each(function(i, e) {
+          $(e).css({'animation' : 'news-animation ' + (750+i) + 'ms forwards', 'animation-delay' : (1000 + (i*100)) + 'ms'})
+          console.log(750+i, 500+ (10/i));
+        })
+        // console.log('rede')
+      })
+    </script>
 @endsection

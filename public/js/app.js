@@ -66353,6 +66353,8 @@ __webpack_require__(/*! ./components/TravelSiteForm */ "./resources/js/component
 
 __webpack_require__(/*! ./components/TravelSite */ "./resources/js/components/TravelSite.js");
 
+__webpack_require__(/*! ./components/TravelSiteEdit */ "./resources/js/components/TravelSiteEdit.js");
+
 /***/ }),
 
 /***/ "./resources/js/bootstrap.js":
@@ -66547,6 +66549,12 @@ function (_Component) {
     _classCallCheck(this, FormMap);
 
     _this = _possibleConstructorReturn(this, _getPrototypeOf(FormMap).call(this, props));
+    _this.state = {
+      position: {
+        lat: 1.4692688,
+        lng: 124.8391552
+      }
+    };
     _this.geocode = _this.geocode.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
@@ -66580,6 +66588,13 @@ function (_Component) {
       });
     }
   }, {
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(props) {// const {lat, lng} = props.position;
+      // const position = new this.props.google.maps.LatLng(lat, lng);
+      // console.log(position);
+      // this.props.map.setCenter(position);
+    }
+  }, {
     key: "render",
     value: function render() {
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -66595,11 +66610,10 @@ function (_Component) {
           height: '100%',
           position: 'relative'
         },
-        initialCenter: {
-          lat: 1.4692688,
-          lng: 124.8391552
-        }
+        initialCenter: this.state.position,
+        center: this.props.position
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(google_maps_react__WEBPACK_IMPORTED_MODULE_1__["Marker"], {
+        position: this.props.position,
         draggable: true,
         onDragend: this.markerMove.bind(this)
       }))));
@@ -67134,6 +67148,387 @@ function (_Component) {
 
 if (document.getElementById('travel-site')) {
   react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TravelSite, null), document.getElementById('travel-site'));
+}
+
+/***/ }),
+
+/***/ "./resources/js/components/TravelSiteEdit.js":
+/*!***************************************************!*\
+  !*** ./resources/js/components/TravelSiteEdit.js ***!
+  \***************************************************/
+/*! exports provided: TravelSiteEdit */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TravelSiteEdit", function() { return TravelSiteEdit; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _FormMap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FormMap */ "./resources/js/components/FormMap.js");
+/* harmony import */ var _UploadingModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./UploadingModal */ "./resources/js/components/UploadingModal.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+
+
+
+
+
+var TravelSiteEdit =
+/*#__PURE__*/
+function (_Component) {
+  _inherits(TravelSiteEdit, _Component);
+
+  function TravelSiteEdit(props) {
+    var _this;
+
+    _classCallCheck(this, TravelSiteEdit);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TravelSiteEdit).call(this, props));
+    _this.state = {
+      name: "",
+      address: "",
+      travel_type_id: '',
+      photo: [],
+      files: [],
+      description: '',
+      latitude: 0,
+      longitude: 0,
+      types: [],
+      errors: [],
+      progress: 0,
+      site_pictures: []
+    };
+    _this.getTypes = _this.getTypes.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.onChange = _this.onChange.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.onFileSelected = _this.onFileSelected.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.onFileSelect = _this.onFileSelect.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.postData = _this.postData.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.getSite = _this.getSite.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(TravelSiteEdit, [{
+    key: "getTypes",
+    value: function getTypes() {
+      var _this2 = this;
+
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.get('/api/types').then(function (resp) {
+        _this2.setState({
+          types: resp.data
+        });
+      });
+    }
+  }, {
+    key: "getSite",
+    value: function getSite() {
+      var _this3 = this;
+
+      var id = document.querySelector('meta[name="travel-id"]').content;
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.get("/dashboard/tempat-wisata/".concat(id, "/api")).then(function (resp) {
+        var _resp$data = resp.data,
+            name = _resp$data.name,
+            address = _resp$data.address,
+            description = _resp$data.description,
+            latitude = _resp$data.latitude,
+            longitude = _resp$data.longitude,
+            site_pictures = _resp$data.site_pictures,
+            travel_type_id = _resp$data.travel_type_id;
+
+        _this3.setState({
+          name: name,
+          address: address,
+          description: description,
+          latitude: latitude,
+          longitude: longitude,
+          site_pictures: site_pictures,
+          travel_type_id: travel_type_id
+        });
+      });
+    }
+  }, {
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.getTypes();
+      this.getSite();
+    }
+  }, {
+    key: "onChange",
+    value: function onChange(ev) {
+      this.setState(_defineProperty({}, ev.target.name, ev.target.value));
+    }
+  }, {
+    key: "onFileSelected",
+    value: function onFileSelected(ev) {
+      this.setState({
+        photo: ev,
+        files: ev.map(function (file) {
+          return Object.assign(file, {
+            preview: URL.createObjectURL(file)
+          });
+        })
+      });
+    }
+  }, {
+    key: "onFileSelect",
+    value: function onFileSelect(ev) {
+      var _this4 = this;
+
+      this.setState({
+        photo: ev.target.files[0],
+        files: Object.assign(ev.target.files[0], {
+          preview: URL.createObjectURL(ev.target.files[0])
+        })
+      }, function () {
+        return console.log(_this4.state.files);
+      });
+    }
+  }, {
+    key: "postData",
+    value: function postData(ev) {
+      var _this5 = this;
+
+      var _this$state = this.state,
+          name = _this$state.name,
+          address = _this$state.address,
+          description = _this$state.description,
+          travel_type_id = _this$state.travel_type_id,
+          longitude = _this$state.longitude,
+          latitude = _this$state.latitude,
+          photo = _this$state.photo;
+      ev.preventDefault();
+      var FD = new FormData();
+      FD.append('photo', photo);
+      FD.append('name', name);
+      FD.append('address', address);
+      FD.append('description', description);
+      FD.append('travel_type_id', travel_type_id);
+      FD.append('longitude', longitude);
+      FD.append('latitude', latitude); // try {
+
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.post('/dashboard/tempat-wisata/', FD, {
+        onUploadProgress: function onUploadProgress(progress) {
+          return _this5.setState({
+            progress: Math.round(progress.loaded * 100 / progress.total)
+          });
+        },
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then(function (resp) {
+        _this5.uploadModal.openModal();
+
+        if (resp.data.site) _this5.setState({
+          name: '',
+          address: '',
+          description: '',
+          travel_type_id: '',
+          files: [],
+          photo: []
+        }, function () {
+          return _this5.fileInput.value = '';
+        });
+      }).catch(function (error) {
+        return _this5.setState({
+          errors: error.response.data.errors
+        });
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this6 = this;
+
+      var _this$state2 = this.state,
+          name = _this$state2.name,
+          address = _this$state2.address,
+          description = _this$state2.description,
+          travel_type_id = _this$state2.travel_type_id,
+          errors = _this$state2.errors,
+          latitude = _this$state2.latitude,
+          longitude = _this$state2.longitude;
+      var baseStyle = {
+        width: '100%',
+        height: 'auto',
+        borderWidth: 0.5,
+        borderColor: '#666',
+        borderStyle: 'solid',
+        borderRadius: 5,
+        padding: 10,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        cursor: 'pointer'
+      };
+      var thumb = {
+        display: 'inline-flex',
+        borderRadius: 2,
+        border: '1px solid #eaeaea',
+        marginBottom: 8,
+        marginRight: 8,
+        width: 300,
+        height: 300,
+        padding: 4,
+        boxSizing: 'border-box'
+      };
+      var thumbInner = {
+        display: 'flex',
+        minWidth: 0,
+        overflow: 'hidden'
+      };
+      var img = {
+        display: 'inline',
+        width: 'auto',
+        height: '100%'
+      };
+      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "row"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-6"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("form", {
+        action: "",
+        encType: "multipart/form-data",
+        method: "post"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        htmlFor: "",
+        className: "control-label mb-1 mt-1"
+      }, "Nama tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        type: "text",
+        onChange: this.onChange,
+        value: name,
+        name: "name",
+        placeholder: "Nama tempat wisata",
+        className: errors.name ? "form-control is-invalid" : "form-control"
+      }), errors.name ? errors.name.map(function (error) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+          className: "invalid-feedback"
+        }, error);
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        htmlFor: "",
+        className: "control-label mb-1 mt-1"
+      }, "Alamat tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        type: "text",
+        onChange: this.onChange,
+        value: address,
+        name: "address",
+        placeholder: "Alamat tempat wisata",
+        className: errors.address ? "form-control is-invalid" : "form-control"
+      }), errors.address ? errors.address.map(function (error) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+          className: "invalid-feedback"
+        }, error);
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        htmlFor: "",
+        className: "control-label mb-1 mt-1"
+      }, "Tipe wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("select", {
+        name: "travel_type_id",
+        onChange: this.onChange,
+        value: travel_type_id,
+        id: "",
+        className: errors.travel_type_id ? "form-control is-invalid" : "form-control"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
+        value: ""
+      }, "Pilih tipe wisata"), this.state.types.map(function (type, i) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("option", {
+          key: i,
+          value: type.id
+        }, type.name);
+      })), errors.travel_type_id ? errors.travel_type_id.map(function (error) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+          className: "invalid-feedback"
+        }, error);
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        htmlFor: "",
+        className: "control-label mb-1 mt-1"
+      }, "Deskripsi tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("textarea", {
+        name: "description",
+        onChange: this.onChange,
+        value: description,
+        rows: "5",
+        placeholder: "Deskripsi",
+        className: errors.description ? "form-control is-invalid" : "form-control"
+      }), errors.description ? errors.description.map(function (error) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+          className: "invalid-feedback"
+        }, error);
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
+        htmlFor: "",
+        className: "control-label mb-1 mt-1"
+      }, "Gambar tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        type: "file",
+        name: "photo",
+        id: "",
+        onChange: this.onFileSelect,
+        key: function key(ref) {
+          return _this6.fileInput = ref;
+        },
+        multiple: false,
+        accept: ['image/jpg', 'image/jpeg', 'image/png'],
+        className: "form-control"
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        type: "submit",
+        onClick: this.postData,
+        className: "btn btn-outline-success btn-sm"
+      }, "Buat"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "col-md-6"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_FormMap__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        position: {
+          lat: latitude,
+          lng: longitude
+        },
+        address: function address(_address) {
+          return _this6.setState({
+            address: _address
+          });
+        },
+        onCoordChange: function onCoordChange(_ref) {
+          var latitude = _ref.latitude,
+              longitude = _ref.longitude;
+          return _this6.setState({
+            latitude: latitude,
+            longitude: longitude
+          });
+        }
+      }), this.state.files.length !== 0 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+        src: this.state.files.preview,
+        alt: "",
+        className: "img-fluid img-thumbnail my-2"
+      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UploadingModal__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        ref: function ref(_ref2) {
+          return _this6.uploadModal = _ref2;
+        },
+        progress: this.state.progress
+      }));
+    }
+  }]);
+
+  return TravelSiteEdit;
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]);
+
+if (document.getElementById('travel-edit')) {
+  react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(TravelSiteEdit, null), document.getElementById('travel-edit'));
 }
 
 /***/ }),

@@ -6,6 +6,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="base-url" content="{{ url('/') }}">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  @yield('meta')
   <title>@yield('title') | {{ config('app.name', 'Dashboard - Dinas Pariwisata Kota Manado') }}</title>  
   <link href="{{ mix('css/app.css') }}" rel="stylesheet">
   <link href="{{ asset('css/dark.css') }}" rel="stylesheet">

@@ -10616,6 +10616,10 @@ textarea {
   cursor: pointer;
 }
 
+.anim {
+  opacity: 0;
+}
+
 @-webkit-keyframes slide {
   0% {
     -webkit-transform: translateY(-5%);
@@ -10725,6 +10729,34 @@ textarea {
 @media (min-width: 769px) and (max-width: 991px) {
   body::after {
     height: 280px !important;
+  }
+}
+
+@-webkit-keyframes news-animation {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(100%);
+            transform: translateY(100%);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+}
+
+@keyframes news-animation {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(100%);
+            transform: translateY(100%);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
   }
 }
 

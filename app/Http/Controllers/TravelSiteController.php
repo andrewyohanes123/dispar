@@ -109,7 +109,13 @@ class TravelSiteController extends Controller
      */
     public function edit($id)
     {
-        //
+        $travel = Site::findOrFail($id);
+        return view('dashboard.travel-edit', compact('travel'));
+    }
+
+    public function api($id)
+    {
+        return Site::with(['travel_type', 'site_type', 'site_pictures'])->findOrFail($id);
     }
 
     /**

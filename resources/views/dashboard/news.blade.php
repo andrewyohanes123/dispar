@@ -30,7 +30,7 @@
     @endif
     <div class="card-columns">
       @foreach ($news as $item)
-          <div class="card mt-2 mb-1">
+          <div class="card border-0 shadow-sm mt-2 mb-1">
             <img src="{{ asset('storage/img/' . $item->hero_img) }}" alt="" class="card-img-top">
             <div class="card-body">
               <h4 class="m-0">{{ $item->title }}</h4>
