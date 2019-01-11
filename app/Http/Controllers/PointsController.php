@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Point;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PointsController extends Controller
 {
@@ -37,7 +38,19 @@ class PointsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'point' => 'required|min:10'
+        ], [
+            'point.required' => 'Masukkan visi dan misi',
+            'point.min' => 'Visi misi harus melebihi 10 karakter'
+        ]);
+
+        $point = Point::create([
+            'point' => $request->point,
+            'user_id' => Auth::user()->id
+        ]);
+
+        return redirect()->route('dashboard.main');
     }
 
     /**

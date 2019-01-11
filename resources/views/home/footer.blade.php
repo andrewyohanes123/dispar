@@ -14,9 +14,9 @@
     </div>
   </div>
   <div class="col-md-4">
-    <h4 class="mb-3 text-right"><i class="fa fa-share-square fa-fw"></i>&nbsp;Media Sosial</h4>
+    <h4 class="mb-3"><i class="fa fa-share-square fa-fw"></i>&nbsp;Media Sosial</h4>
     <hr>
-    <ul class="list-style-none text-right">
+    <ul class="list-style-none">
       <li class="d-inline-block">
         <a href="" class="p-2">
           <span class="fa-stack fa-lg">

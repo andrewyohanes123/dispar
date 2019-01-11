@@ -106,12 +106,18 @@
         </div>
         {{--  --}}
         <div class="card">
-          <div class="card-body">
-            <p class="m-0"><i class="fa fa-bookmark-o fa-lg"></i>&nbsp;Visi Misi</p>
-          </div>
-          <textarea name="" id="visi" cols="30" rows="10"></textarea>
-          <div class="card-body">
-          </div>
+          <form action="{{ route('dashboard.point') }}" method="post">
+            {{--  --}}
+            <div class="card-body">
+              <p class="m-0"><i class="fa fa-bookmark-o fa-lg"></i>&nbsp;Visi Misi</p>
+            </div>
+            <textarea name="point" id="visi" class="form-control" placeholder="Loading..." rows="0">{{ $point->point }}</textarea>
+            @csrf
+            <div class="card-body">
+              <button type="submit" class="btn btn-outline-success btn-sm"><i class="fa fa-save fa-fw"></i>&nbsp;Simpan</button>
+            </div>
+            {{--  --}}
+          </form>
         </div>
       </div>
       {{--  --}}

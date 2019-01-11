@@ -10495,6 +10495,17 @@ a.text-dark:focus {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
+body {
+  position: relative;
+  height: 100%;
+}
+
+body::after {
+  content: "";
+  display: block;
+  height: 234px;
+}
+
 textarea {
   resize: none;
 }
@@ -10529,6 +10540,16 @@ textarea {
 
 .vh-100 {
   height: 100vh !important;
+}
+
+.footer-place {
+  height: 100%;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }
 
 .banner {
@@ -10688,6 +10709,37 @@ textarea {
     opacity: 1;
     -webkit-transform: translateY(0);
             transform: translateY(0);
+  }
+}
+
+@media (min-width: 1000px) {
+  .footer {
+    text-align: center;
+  }
+
+  .footer .row div.col-md-4:nth-child(3) {
+    text-align: right;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 991px) {
+  body::after {
+    height: 280px !important;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 768px) {
+  body::after {
+    height: 490px !important;
+  }
+
+  .footer {
+    text-align: center;
+  }
+
+  .footer .row .col-md-4:nth-child(3) {
+    margin-top: 4px;
+    text-align: center;
   }
 }
 

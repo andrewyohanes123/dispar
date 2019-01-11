@@ -46,17 +46,19 @@
             </ul>
         </div>
     </nav>
-    <div class="mt-4">
+    <div class="mt-4 position-relative">
         @yield('banner')
         <div class="container pt-5">
             @yield('content')
         </div>
-        <div class="container-fluid bg-dark text-white p-3">
+    </div>
+    {{-- <div class="p-5 footer-place position-relative"> --}}
+        <div class="container-fluid bg-dark footer text-white p-3">
             <div class="container">
                 @include('home.footer')
             </div>
         </div>
-    </div>
+    {{-- </div> --}}
     <script src="{{ mix('js/app.js') }}"></script>
     @yield('script')
 </body>

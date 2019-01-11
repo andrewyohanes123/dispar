@@ -20,7 +20,7 @@ class RootController extends Controller
     public function index()
     {
         setLocale(LC_ALL, 'IND');
-        $news = News::orderBy('id', 'ASC')->paginate(5);
+        $news = News::orderBy('id', 'desc')->take(5)->get();
         $note = Note::latest()->first();
         $facility = \App\SiteType::whereNotIn('id', [5])->get();
         return view('home.main', compact('news', 'note', 'facility'));

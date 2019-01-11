@@ -34,8 +34,10 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
     $pics = \App\SitePicture::count();
     $info = \App\Note::orderBy('id', 'DESC')->get()->first();
     $banner = \App\Banner::orderBy('id', 'DESC')->get()->last();
-    return view('dashboard.main', compact('main', 'site', 'pics', 'facilities', 'info', 'banner'));
+    $point = \App\Point::orderBy('id', 'desc')->take(1)->first();
+    return view('dashboard.main', compact('main', 'site', 'pics', 'facilities', 'info', 'banner', 'point'));
   })->name('dashboard.main');
+  Route::post('/visi-misi', 'PointsController@store')->name('dashboard.point');
   Route::resource('berita', 'NewsController');
   Route::resource('tempat-wisata', 'TravelSiteController');
   Route::resource('fasilitas-wisata', 'FacilitiesController');

@@ -13,7 +13,7 @@
     <hr>
     <div class="card-columns">
         @foreach ($sites as $site)  
-        <div class="card">
+        <div class="card shadow-sm">
           <a href="{{ route('root.site-show', ['slug' => $site->slug]) }}"><img src="{{ asset('storage/img/' . $site->site_pictures->first()->photo) }}" alt="" class="card-img-top"></a>
           <div class="card-body">
             <h4 class="m-0">{{ $site->name }}</h4>

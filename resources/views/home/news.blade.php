@@ -15,7 +15,7 @@
     <hr>
     <div class="card-columns">
       @foreach ($news as $item)
-          <div class="card">
+          <div class="card shadow-sm">
             <a href="{{ route('root.show-news', ['slug' => $item->slug, 'year' => $item->created_at->format('Y'), 'month' => $item->created_at->format('m')]) }}"><img src="{{ asset('storage/img/'. $item->hero_img) }}" class="card-img-top" alt=""></a>
             <div class="card-body">
               <h5 class="m-0"><a href="{{ route('root.show-news', ['slug' => $item->slug, 'year' => $item->created_at->format('Y'), 'month' => $item->created_at->format('m')]) }}">{{ $item->title }}</a></h5>
