@@ -24,6 +24,7 @@ Route::get('/tempat-wisata', 'SiteController@index')->name('root.sites');
 Route::get('/tempat-wisata/{slug}', 'SiteController@show')->name('root.site-show');
 Route::get('/gallery', 'GalleryController@index')->name('root.galleries');
 Route::get('/fasilitas/{nama}', 'FacilityController@index')->name('root.facilities');
+Route::geT('/visi-misi', 'PointsController@index')->name('root.point');
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
   Route::get('/main', function () {
