@@ -179,7 +179,7 @@ export class TravelSiteForm extends Component {
             </form>
           </div>
           <div className="col-md-6">
-            <FormMap onCoordChange={({ latitude, longitude }) => this.setState({ latitude, longitude })} />
+            <FormMap address={(address) => this.setState({ address })} onCoordChange={({ latitude, longitude }) => this.setState({ latitude, longitude })} />
             {this.state.files.length !== 0 && <img src={this.state.files.preview} alt="" className="img-fluid img-thumbnail my-2" />}
           </div>
         </div>

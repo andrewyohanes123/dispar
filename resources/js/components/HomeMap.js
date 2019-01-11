@@ -92,11 +92,7 @@ class HomeMap extends Component {
         {
           this.state.markers.map((marker, i) => (
             // <React.Fragment>
-              <Marker title={marker.site_type.name} icon={{ 
-                url : this.iconDeterminer(marker),
-                anchor : new google.maps.Point(32, 32),
-                scaledSize : new google.maps.Size(30, 30)
-               }} onClick={ (props, point) => this.onMarkerClick(marker, point)} name={marker.name} key={i} position={{ lat : parseFloat(marker.latitude), lng : parseFloat(marker.longitude) }} />
+              <Marker title={marker.site_type.name} onClick={ (props, point) => this.onMarkerClick(marker, point)} name={marker.name} key={i} position={{ lat : parseFloat(marker.latitude), lng : parseFloat(marker.longitude) }} />
             // </React.Fragment>
           ))
           }

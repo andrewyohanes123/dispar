@@ -66526,13 +66526,13 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
 
 
@@ -66541,18 +66541,42 @@ var FormMap =
 function (_Component) {
   _inherits(FormMap, _Component);
 
-  function FormMap() {
+  function FormMap(props) {
+    var _this;
+
     _classCallCheck(this, FormMap);
 
-    return _possibleConstructorReturn(this, _getPrototypeOf(FormMap).apply(this, arguments));
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(FormMap).call(this, props));
+    _this.geocode = _this.geocode.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
   }
 
   _createClass(FormMap, [{
     key: "markerMove",
     value: function markerMove(a, b) {
+      var _b$position = b.position,
+          lat = _b$position.lat,
+          lng = _b$position.lng;
       this.props.onCoordChange({
         latitude: b.position.lat(),
         longitude: b.position.lng()
+      });
+      this.geocode(lat(), lng());
+    }
+  }, {
+    key: "geocode",
+    value: function geocode(lat, lng) {
+      var _this2 = this;
+
+      console.log(lat, lng);
+      var geocode = new this.props.google.maps.Geocoder();
+      geocode.geocode({
+        location: {
+          lat: lat,
+          lng: lng
+        }
+      }, function (res) {
+        return _this2.props.address(res[0].formatted_address);
       });
     }
   }, {
@@ -66751,11 +66775,6 @@ function (_Component) {
         return (// <React.Fragment>
           react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(google_maps_react__WEBPACK_IMPORTED_MODULE_1__["Marker"], {
             title: marker.site_type.name,
-            icon: {
-              url: _this3.iconDeterminer(marker),
-              anchor: new google.maps.Point(32, 32),
-              scaledSize: new google.maps.Size(30, 30)
-            },
             onClick: function onClick(props, point) {
               return _this3.onMarkerClick(marker, point);
             },
@@ -66926,7 +66945,8 @@ function (_Component) {
       sites: [],
       page: 1,
       last_page: 2,
-      q: ''
+      q: '',
+      loading: false
     };
     _this.getSites = _this.getSites.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.trackScreen = _this.trackScreen.bind(_assertThisInitialized(_assertThisInitialized(_this)));
@@ -66957,7 +66977,10 @@ function (_Component) {
             page: page
           };
         }, function () {
-          return _this2.getSites();
+          var _this2$state = _this2.state,
+              page = _this2$state.page,
+              last_page = _this2$state.last_page;
+          if (page !== last_page) _this2.getSites();
         });
       }
     }
@@ -66969,6 +66992,9 @@ function (_Component) {
       var _this$state = this.state,
           pageParams = _this$state.page,
           q = _this$state.q;
+      this.setState({
+        loading: true
+      });
       Object(axios__WEBPACK_IMPORTED_MODULE_2__["get"])('/dashboard/travel-site', {
         params: {
           page: pageParams,
@@ -66980,12 +67006,10 @@ function (_Component) {
               last_page = _ref2.last_page,
               page = _ref2.page;
           console.log(page === last_page ? 'last page' : "page ".concat(page));
-          return page === last_page ? {
-            sites: _toConsumableArray(resp.data.data),
-            last_page: resp.data.last_page
-          } : {
+          return {
             sites: [].concat(_toConsumableArray(sites), _toConsumableArray(resp.data.data)),
-            last_page: resp.data.last_page
+            last_page: resp.data.last_page,
+            loading: false
           };
         });
       });
@@ -67017,7 +67041,9 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var sites = this.state.sites;
+      var _this$state2 = this.state,
+          sites = _this$state2.sites,
+          loading = _this$state2.loading;
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "d-flex flex-row justify-content-between align-items-center"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", {
@@ -67048,7 +67074,15 @@ function (_Component) {
         className: "btn btn-dark"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
         className: "fa fa-search fa-lg"
-      })))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      })))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), loading ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card mb-2"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "card-body text-center"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+        className: "m-0 text-muted small"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
+        className: "fa fa-circle-o-notch fa-spin fa-md"
+      }), "\xA0Loading"))) : react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-columns",
         onScroll: this.trackScreen
       }, sites.map(function (site, i) {
@@ -67432,6 +67466,11 @@ function (_Component) {
       }, "Buat"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_FormMap__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        address: function address(_address) {
+          return _this5.setState({
+            address: _address
+          });
+        },
         onCoordChange: function onCoordChange(_ref) {
           var latitude = _ref.latitude,
               longitude = _ref.longitude;
@@ -67605,8 +67644,8 @@ function (_Component) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Applications/XAMPP/xamppfiles/htdocs/dispar/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Applications/XAMPP/xamppfiles/htdocs/dispar/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! C:\xampp\htdocs\dispar\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\xampp\htdocs\dispar\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

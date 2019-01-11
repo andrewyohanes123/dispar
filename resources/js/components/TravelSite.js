@@ -11,7 +11,8 @@ export default class TravelSite extends Component {
       sites: [],
       page: 1,
       last_page: 2,
-      q: ''
+      q: '',
+      loading : false
     }
 
     this.getSites = this.getSites.bind(this);
@@ -32,15 +33,20 @@ export default class TravelSite extends Component {
       this.setState(({ page, last_page }) => {
         (page === last_page) ? page = last_page : page++;
         return { page }
-      }, () => this.getSites());
+      }, () => {
+        const {page, last_page} = this.state;
+        if (page !== last_page)
+          this.getSites();
+      });
     }
   }
 
   getSites() {
     const { page: pageParams, q } = this.state;
+    this.setState({ loading : true });
     get('/dashboard/travel-site', { params: { page: pageParams, q } }).then(resp => this.setState(({ sites, last_page, page }) => {
       console.log(page === last_page ? 'last page' : `page ${page}`)
-      return page === last_page ? { sites: [...resp.data.data], last_page: resp.data.last_page } : { sites: [...sites, ...resp.data.data], last_page: resp.data.last_page }
+      return { sites: [...sites, ...resp.data.data], last_page: resp.data.last_page, loading : false }
     }));
   }
 
@@ -58,7 +64,7 @@ export default class TravelSite extends Component {
   }
 
   render() {
-    const { sites } = this.state;
+    const { sites, loading } = this.state;
     return (
       <Fragment>
         <div className="d-flex flex-row justify-content-between align-items-center">
@@ -72,7 +78,11 @@ export default class TravelSite extends Component {
         </div>
         <hr/>
         {/*  */}
-        <div className="card-columns" onScroll={this.trackScreen}>
+        { loading ? <div className="card mb-2">
+          <div className="card-body text-center">
+            <p className="m-0 text-muted small"><i className="fa fa-circle-o-notch fa-spin fa-md"></i>&nbsp;Loading</p>
+          </div>
+        </div> : <div className="card-columns" onScroll={this.trackScreen}>
           {sites.map((site, i) => (<div key={i} className="card">
             <img src={`/storage/img/${site.site_pictures[0].photo}`} alt={site.name} title={site.name} className="card-img-top" />
             <div className="card-body">
@@ -85,7 +95,7 @@ export default class TravelSite extends Component {
               <a href={`${baseurl}/dashboard/tempat-wisata/${site.id}`} className="btn btn-primary btn-sm" title={`Preview ${site.name}`} ><i className="fa fa-eye fa-lg"></i></a>
             </div>
           </div>))}
-        </div>
+        </div>}
       </Fragment>
     )
   }

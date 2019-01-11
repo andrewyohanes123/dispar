@@ -2,8 +2,22 @@ import React, { Component, Fragment } from 'react';
 import {Map, GoogleApiWrapper, Marker} from 'google-maps-react';
 
 export class FormMap extends Component {
+  constructor(props) {
+    super(props);
+
+    this.geocode = this.geocode.bind(this);
+  }
+
   markerMove(a, b) {
+    const {lat,lng} = b.position;
     this.props.onCoordChange({latitude : b.position.lat(), longitude : b.position.lng()});
+    this.geocode(lat(), lng());
+  }
+
+  geocode(lat, lng) {
+    console.log(lat, lng)
+    let geocode = new this.props.google.maps.Geocoder;
+    geocode.geocode({location : {lat, lng}}, (res) => this.props.address(res[0].formatted_address))
   }
   
   render() {

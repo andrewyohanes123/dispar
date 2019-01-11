@@ -10547,10 +10547,10 @@ textarea {
   color: white;
   text-shadow: 0px 2px 15px rgba(0, 0, 0, 0.9), 0px 0px 20px black, 0px 0px 25px black;
   opacity: 0;
-  -webkit-animation-delay: 10s;
-          animation-delay: 10s;
-  -webkit-animation: cover 750ms forwards;
-          animation: cover 750ms forwards;
+  -webkit-animation: cover 1750ms forwards;
+          animation: cover 1750ms forwards;
+  -webkit-animation-delay: 2s;
+          animation-delay: 2s;
 }
 
 .banner p span {
@@ -10602,8 +10602,8 @@ textarea {
   }
 
   50% {
-    -webkit-transform: translateY(2%);
-            transform: translateY(2%);
+    -webkit-transform: translateY(5%);
+            transform: translateY(5%);
   }
 
   100% {
@@ -10619,8 +10619,8 @@ textarea {
   }
 
   50% {
-    -webkit-transform: translateY(2%);
-            transform: translateY(2%);
+    -webkit-transform: translateY(5%);
+            transform: translateY(5%);
   }
 
   100% {
@@ -10657,15 +10657,13 @@ textarea {
 
 @-webkit-keyframes cover {
   0% {
-    opacity: 0.2;
     -webkit-transform: translateY(-100%);
             transform: translateY(-100%);
   }
 
   50% {
-    opacity: 0.5;
-    -webkit-transform: translateY(1%);
-            transform: translateY(1%);
+    -webkit-transform: translateY(3%);
+            transform: translateY(3%);
   }
 
   100% {
@@ -10677,15 +10675,13 @@ textarea {
 
 @keyframes cover {
   0% {
-    opacity: 0.2;
     -webkit-transform: translateY(-100%);
             transform: translateY(-100%);
   }
 
   50% {
-    opacity: 0.5;
-    -webkit-transform: translateY(1%);
-            transform: translateY(1%);
+    -webkit-transform: translateY(3%);
+            transform: translateY(3%);
   }
 
   100% {

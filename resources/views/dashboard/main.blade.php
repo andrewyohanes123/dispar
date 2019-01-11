@@ -96,7 +96,7 @@
           <div class="card-header o-hidden d-flex flex-row justify-content-between align-items-center">
               <p class="m-0 card-title d-inline-block"><i class="fa fa-picture-o fa-lg"></i>&nbsp;Cover</p>
           </div>
-          @if (count($banner) > 0)
+          @if ($banner !== null)
             <img src="{{ asset('/storage/img' . $banner) }}" alt="" class="card-img rounded-0">
           @else
             <div class="card-body">
