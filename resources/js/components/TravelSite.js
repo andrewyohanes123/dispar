@@ -22,6 +22,7 @@ export default class TravelSite extends Component {
   }
 
   componentDidMount() {
+    this.setState({ loading : true });
     this.getSites();
     document.addEventListener('scroll', this.trackScreen);
   }
@@ -43,7 +44,7 @@ export default class TravelSite extends Component {
 
   getSites() {
     const { page: pageParams, q } = this.state;
-    this.setState({ loading : true });
+    // this.setState({ loading : true });
     get('/dashboard/travel-site', { params: { page: pageParams, q } }).then(resp => this.setState(({ sites, last_page, page }) => {
       console.log(page === last_page ? 'last page' : `page ${page}`)
       return { sites: [...sites, ...resp.data.data], last_page: resp.data.last_page, loading : false }
@@ -78,12 +79,12 @@ export default class TravelSite extends Component {
         </div>
         <hr/>
         {/*  */}
-        { loading ? <div className="card mb-2">
+        { loading ? <div className="card border-0 shadow-sm mb-2">
           <div className="card-body text-center">
             <p className="m-0 text-muted small"><i className="fa fa-circle-o-notch fa-spin fa-md"></i>&nbsp;Loading</p>
           </div>
         </div> : <div className="card-columns" onScroll={this.trackScreen}>
-          {sites.map((site, i) => (<div key={i} className="card">
+          {sites.map((site, i) => (<div key={i} className="card border-0 shadow-sm">
             <img src={`/storage/img/${site.site_pictures[0].photo}`} alt={site.name} title={site.name} className="card-img-top" />
             <div className="card-body">
               <h4 className="m-0">{site.name}</h4>

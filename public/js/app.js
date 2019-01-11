@@ -66972,6 +66972,9 @@ function (_Component) {
   _createClass(TravelSite, [{
     key: "componentDidMount",
     value: function componentDidMount() {
+      this.setState({
+        loading: true
+      });
       this.getSites();
       document.addEventListener('scroll', this.trackScreen);
     }
@@ -67005,10 +67008,8 @@ function (_Component) {
 
       var _this$state = this.state,
           pageParams = _this$state.page,
-          q = _this$state.q;
-      this.setState({
-        loading: true
-      });
+          q = _this$state.q; // this.setState({ loading : true });
+
       Object(axios__WEBPACK_IMPORTED_MODULE_2__["get"])('/dashboard/travel-site', {
         params: {
           page: pageParams,
@@ -67089,7 +67090,7 @@ function (_Component) {
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
         className: "fa fa-search fa-lg"
       })))))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), loading ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "card mb-2"
+        className: "card border-0 shadow-sm mb-2"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "card-body text-center"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
@@ -67102,7 +67103,7 @@ function (_Component) {
       }, sites.map(function (site, i) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           key: i,
-          className: "card"
+          className: "card border-0 shadow-sm"
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
           src: "/storage/img/".concat(site.site_pictures[0].photo),
           alt: site.name,
