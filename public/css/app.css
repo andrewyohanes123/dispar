@@ -10616,8 +10616,65 @@ textarea {
   cursor: pointer;
 }
 
+.preview {
+  width: 300px;
+  max-height: 300px;
+  overflow: hidden;
+  border-radius: 0.25em;
+  display: inline-block;
+  margin: 0 5px;
+}
+
+.preview .shadow-sm {
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.35) !important;
+}
+
 .anim {
   opacity: 0;
+}
+
+.header-anim {
+  opacity: 0;
+  -webkit-animation: header 750ms forwards;
+          animation: header 750ms forwards;
+  -webkit-animation-delay: 1s;
+          animation-delay: 1s;
+}
+
+@-webkit-keyframes header {
+  0% {
+    -webkit-transform: translateY(-100%);
+            transform: translateY(-100%);
+  }
+
+  50% {
+    -webkit-transform: translateY(1%);
+            transform: translateY(1%);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
+}
+
+@keyframes header {
+  0% {
+    -webkit-transform: translateY(-100%);
+            transform: translateY(-100%);
+  }
+
+  50% {
+    -webkit-transform: translateY(1%);
+            transform: translateY(1%);
+  }
+
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+            transform: translateY(0);
+  }
 }
 
 @-webkit-keyframes slide {

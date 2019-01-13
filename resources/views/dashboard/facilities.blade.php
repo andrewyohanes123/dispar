@@ -15,7 +15,7 @@
     @if ($facilities->count() > 0)
       <div class="card-columns">
         @foreach ($facilities as $facility)
-            <div class="card shadow-sm">
+            <div class="card border-0 shadow-sm">
               <img class="card-img-top" src="{{ asset('storage/img/' . $facility->site_pictures->first()->photo) }}" alt="">
               <div class="card-body ">
                 <h4 class="m-0">{{ $facility->name }}</h4>

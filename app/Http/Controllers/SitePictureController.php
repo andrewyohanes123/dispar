@@ -3,14 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use App\SitePicture;
 
-use App\News;
-use App\Site;
-use App\Banner;
-use App\Note;
-
-class RootController extends Controller
+class SitePictureController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,27 +14,7 @@ class RootController extends Controller
      */
     public function index()
     {
-        setLocale(LC_ALL, 'IND');
-        $news = News::orderBy('id', 'desc')->take(5)->get();
-        $note = Note::latest()->first();
-        $facility = \App\SiteType::whereNotIn('id', [5])->get();
-        return view('home.main', compact('news', 'note', 'facility'));
-    }
-
-    public function news(Request $request)
-    {
-        $news = News::orderBy('created_at', 'DESC')->paginate(9);
-        $facility = \App\SiteType::whereNotIn('id', [5])->get();
-        if ($request->q) $news = News::search($request->q)->orderBy('created_at', 'DESC')->paginate(9);
-        return view('home.news', compact('news', 'facility'));
-    }
-
-    public function show_news($year, $month, $slug)
-    {
-        $news = News::where('slug', $slug)->whereMonth('created_at', $month)->whereYear('created_at', $year)->get()->first();
-        $facility = \App\SiteType::whereNotIn('id', [5])->get();
-        $collection = News::orderBy('created_at', 'desc')->whereNotIn('id', [$news->id])->take(5)->get();
-        return view('home.news-show', compact('news', 'facility', 'collection'));
+        //
     }
 
     /**
@@ -60,7 +35,23 @@ class RootController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'photo' => 'required|file|mimes:jpeg,png,jpg|max:2048'
+        ], [
+            'photo.required' => 'Masukkan foto!',
+            'photo.file' => 'Foto harus berupa file',
+            'photo.mimes' => 'Format file gambar harus JPEG, PNG, atau JPG',
+            'photo.max' => 'Size file gambar harus <= 2048',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            $filenameWithExt = $request->file('photo')->getClientOriginalName();
+            $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+            $ext = $request->file('photo')->getClientOriginalExtension();
+            $file = $filename . "_" . time() . '.' . $ext;
+            $path = $request->file('photo')->storeAs('public/img', $file);
+            return SitePicture::create(['photo' => $file, 'site_id' => $request->id]);
+        }
     }
 
     /**

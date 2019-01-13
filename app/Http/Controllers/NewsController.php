@@ -81,7 +81,8 @@ class NewsController extends Controller
     public function show($id)
     {
         $news = News::findOrFail($id);
-        return view('dashboard.news-show', compact('news'));
+        $collection = News::orderBy('created_at', 'desc')->take(5)->get();
+        return view('dashboard.news-show', compact('news', 'collection'));
     }
 
     /**

@@ -24,6 +24,7 @@ Route::get('/tempat-wisata', 'SiteController@index')->name('root.sites');
 Route::get('/tempat-wisata/{slug}', 'SiteController@show')->name('root.site-show');
 Route::get('/gallery', 'GalleryController@index')->name('root.galleries');
 Route::get('/fasilitas/{nama}', 'FacilityController@index')->name('root.facilities');
+Route::get('/fasilitas/{nama}/{slug}', 'FacilityController@show')->name('root.facilities-show');
 Route::geT('/visi-misi', 'PointsController@index')->name('root.point');
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
@@ -37,6 +38,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
     $point = \App\Point::orderBy('id', 'desc')->take(1)->first();
     return view('dashboard.main', compact('main', 'site', 'pics', 'facilities', 'info', 'banner', 'point'));
   })->name('dashboard.main');
+  Route::post('/site-picture', 'SitePictureController@store');
   Route::post('/visi-misi', 'PointsController@store')->name('dashboard.point');
   Route::resource('berita', 'NewsController');
   Route::resource('tempat-wisata', 'TravelSiteController');

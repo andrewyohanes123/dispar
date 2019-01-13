@@ -19,12 +19,13 @@ export default class TravelSite extends Component {
     this.trackScreen = this.trackScreen.bind(this);
     this.onSearch = this.onSearch.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.loadMore = this.loadMore.bind(this);
   }
 
   componentDidMount() {
     this.setState({ loading : true });
     this.getSites();
-    document.addEventListener('scroll', this.trackScreen);
+    // document.addEventListener('scroll', this.trackScreen);
   }
 
   trackScreen(ev) {
@@ -42,6 +43,18 @@ export default class TravelSite extends Component {
     }
   }
 
+  loadMore(ev) {
+    ev.preventDefault();
+    this.setState(({ page, last_page }) => {
+      (page === last_page) ? page = last_page : page++;
+      return { page }
+    }, () => {
+      const {page, last_page} = this.state;
+      if (page !== (last_page + 1))
+        this.getSites();
+    });
+  }
+
   getSites() {
     const { page: pageParams, q } = this.state;
     // this.setState({ loading : true });
@@ -52,7 +65,7 @@ export default class TravelSite extends Component {
   }
 
   deleteSite(id) {
-    axios.delete(`${baseurl}/dashboard/travel-site/${id}`).then(resp => console.log(resp)).catch(err => console.log(err))
+    axios.delete(`${baseurl}/dashboard/tempat-wisata/${id}`).then(resp => console.log(resp)).catch(err => console.log(err))
   }
 
   onSearch(ev) {
@@ -92,11 +105,13 @@ export default class TravelSite extends Component {
               <p className="m-0 text-truncate">{site.description}</p>
               <hr />
               <a href={`${baseurl}/dashboard/tempat-wisata/${site.id}/edit`} className="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title={`Edit ${site.name}`} ><i className="fa fa-edit fa-lg"></i></a>
-              <a href={`${baseurl}/dashboard/tempat-wisata/${site.id}`} className="btn btn-danger btn-sm" title={`Hapus ${site.name} ?`} ><i className="fa fa-remove fa-lg"></i></a>
+              <a href={`${baseurl}/dashboard/tempat-wisata/${site.id}`} onClick={(ev) => {ev.preventDefault();this.deleteSite(site.id);}} className="btn btn-danger btn-sm" title={`Hapus ${site.name} ?`} ><i className="fa fa-remove fa-lg"></i></a>
               <a href={`${baseurl}/dashboard/tempat-wisata/${site.id}`} className="btn btn-primary btn-sm" title={`Preview ${site.name}`} ><i className="fa fa-eye fa-lg"></i></a>
             </div>
           </div>))}
         </div>}
+        { this.state.page !== (this.state.last_page + 1) &&
+        <a href="#" onClick={this.loadMore} className="d-block my-2 btn btn-outline-primary btn-block">Load More</a>}
       </Fragment>
     )
   }

@@ -14,7 +14,7 @@
     <div class="card-columns">
         @foreach ($facilities as $site)  
         <div class="card">
-          <a href="{{ route('root.site-show', ['slug' => $site->slug]) }}"><img src="{{ asset('storage/img/' . $site->site_pictures->first()->photo) }}" alt="" class="card-img-top"></a>
+          <a href="{{ route('root.facilities-show', ['slug' => $site->slug, 'name' => str_slug(strtolower($site->site_type->name))]) }}"><img src="{{ asset('storage/img/' . $site->site_pictures->first()->photo) }}" alt="" class="card-img-top"></a>
           <div class="card-body">
             <h4 class="m-0">{{ $site->name }}</h4>
             <p class="small text-muted">{{ $site->site_type->name }}</p>

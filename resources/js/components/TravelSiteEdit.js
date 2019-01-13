@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import axios from 'axios';
 import FormMap from './FormMap';
 import UploadingModal from './UploadingModal';
+import baseurl from './BaseURL';
 
 export class TravelSiteEdit extends Component {
   constructor(props) {
@@ -20,7 +21,7 @@ export class TravelSiteEdit extends Component {
       types: [],
       errors: [],
       progress: 0,
-      site_pictures : []
+      site_pictures: []
     }
 
     this.getTypes = this.getTypes.bind(this);
@@ -29,6 +30,7 @@ export class TravelSiteEdit extends Component {
     this.onFileSelect = this.onFileSelect.bind(this);
     this.postData = this.postData.bind(this);
     this.getSite = this.getSite.bind(this);
+    this.uploadPhoto = this.uploadPhoto.bind(this);
   }
 
   getTypes() {
@@ -40,8 +42,8 @@ export class TravelSiteEdit extends Component {
   getSite() {
     const id = document.querySelector('meta[name="travel-id"]').content;
     axios.get(`/dashboard/tempat-wisata/${id}/api`).then(resp => {
-      const { name, address, description, latitude, longitude, site_pictures,travel_type_id} = resp.data;
-      this.setState({ name, address, description, latitude, longitude, site_pictures,travel_type_id});
+      const { name, address, description, latitude, longitude, site_pictures, travel_type_id } = resp.data;
+      this.setState({ name, address, description, latitude, longitude, site_pictures, travel_type_id });
     });
   }
 
@@ -57,12 +59,27 @@ export class TravelSiteEdit extends Component {
   }
 
   onFileSelected(ev) {
-    this.setState({
-      photo: ev,
-      files: ev.map(file => Object.assign(file, {
-        preview: URL.createObjectURL(file)
-      }))
-    })
+    // console.dir(ev.target.files[0]);
+    this.setState({ photo: ev.target.files[0] }, () => this.uploadPhoto());
+  }
+
+  uploadPhoto() {
+    // e.preventDefault();
+    const id = document.querySelector('meta[name="travel-id"]').content;
+    const FD = new FormData();
+    FD.append('photo', this.state.photo)
+    axios.post(`${baseurl}/dashboard/site-picture`, FD, {
+      onUploadProgress: progress => this.setState({ progress: Math.round((progress.loaded * 100) / progress.total) }),
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }, params : {
+        id
+      }
+    }).then(resp => {
+      const {site_pictures} = this.state;
+      site_pictures.push(resp.data);
+      this.setState({ site_pictures, progress : 0 });
+    });
   }
 
   onFileSelect(ev) {
@@ -75,68 +92,17 @@ export class TravelSiteEdit extends Component {
   }
 
   postData(ev) {
-    const { name, address, description, travel_type_id, longitude, latitude, photo } = this.state;
     ev.preventDefault();
-    const FD = new FormData();
-    FD.append('photo', photo);
-    FD.append('name', name);
-    FD.append('address', address);
-    FD.append('description', description);
-    FD.append('travel_type_id', travel_type_id);
-    FD.append('longitude', longitude);
-    FD.append('latitude', latitude);
-
+    const { name, address, description, travel_type_id, longitude, latitude, photo } = this.state;
+    const id = document.querySelector('meta[name="travel-id"]').content;
     // try {
-      axios.post('/dashboard/tempat-wisata/', FD, {
-        onUploadProgress : progress => this.setState({ progress : Math.round((progress.loaded * 100) / progress.total)}) ,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }).then(resp => {
-        this.uploadModal.openModal();
-        if (resp.data.site) this.setState({ name: '', address: '', description: '', travel_type_id: '', files : [], photo : [] }, () => this.fileInput.value = '');
-      }).catch(error => this.setState({ errors: error.response.data.errors }));
+    axios.put(`${baseurl}/dashboard/tempat-wisata/${id}`, { name, address, description, travel_type_id, longitude, latitude }).then(resp => {
+      if (resp.data.site) this.setState({ name: '', address: '', description: '', travel_type_id: '', files: [], photo: [] }, () => this.file.value = '');
+    }).catch(error => this.setState({ errors: error.response.data.errors }));
   }
 
   render() {
     const { name, address, description, travel_type_id, errors, latitude, longitude } = this.state;
-    const baseStyle = {
-      width: '100%',
-      height: 'auto',
-      borderWidth: 0.5,
-      borderColor: '#666',
-      borderStyle: 'solid',
-      borderRadius: 5,
-      padding: 10,
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      cursor: 'pointer'
-    };
-    const thumb = {
-      display: 'inline-flex',
-      borderRadius: 2,
-      border: '1px solid #eaeaea',
-      marginBottom: 8,
-      marginRight: 8,
-      width: 300,
-      height: 300,
-      padding: 4,
-      boxSizing: 'border-box'
-    };
-
-    const thumbInner = {
-      display: 'flex',
-      minWidth: 0,
-      overflow: 'hidden'
-    }
-
-    const img = {
-      display: 'inline',
-      width: 'auto',
-      height: '100%'
-    };
 
     return (
       <Fragment>
@@ -166,18 +132,32 @@ export class TravelSiteEdit extends Component {
               {(errors.description) ?
                 errors.description.map(error => (<span className="invalid-feedback">{error}</span>)) : ''
               }
-              <label htmlFor="" className="control-label mb-1 mt-1">Gambar tempat wisata</label>
-              <input type="file" name="photo" id="" onChange={this.onFileSelect} key={ref => this.fileInput = ref} multiple={false} accept={['image/jpg', 'image/jpeg', 'image/png']} className="form-control" />
               <hr />
               <button type="submit" onClick={this.postData} className="btn btn-outline-success btn-sm">Buat</button>
             </form>
+            <input accept={['image/jpg', 'image/png', 'image/jpeg']} type="file" name="photo" ref={ref => this.file = ref} className="d-none" onChange={this.onFileSelected} />
           </div>
+          {/*  */}
           <div className="col-md-6">
-            <FormMap position={{ lat : latitude, lng : longitude }} address={(address) => this.setState({ address })} onCoordChange={({ latitude, longitude }) => this.setState({ latitude, longitude })} />
-            {this.state.files.length !== 0 && <img src={this.state.files.preview} alt="" className="img-fluid img-thumbnail my-2" />}
+            <FormMap position={{ lat: latitude, lng: longitude }} address={(address) => this.setState({ address })} onCoordChange={({ latitude, longitude }) => this.setState({ latitude, longitude })} />
+            <hr />
+            <button onClick={() => this.file.click()} className="btn btn-outline-success btn-block my-2">Tambah Gambar</button>
+            {this.state.progress > 0 &&
+            <Fragment>
+              <p className="small text-center text-muted">Mengupload</p>
+              <div className="progress">
+                <div style={{ width : `${this.state.progress}%` }} className="progress-bar progress-bar-striped progress-bar-animated">{this.state.progress}%</div>
+              </div>
+            </Fragment>
+            }
+            <hr />
+          </div>
+          <div className="container">
+            {this.state.site_pictures.map((pic, i) => (<div key={i} className="preview shadow-sm">
+              <img src={`${baseurl}/storage/img/${pic.photo}`} alt="" className="img-fluid" />
+            </div>))}
           </div>
         </div>
-        <UploadingModal ref={ref => this.uploadModal = ref} progress={this.state.progress} />
       </Fragment>
     )
   }

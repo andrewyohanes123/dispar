@@ -98,7 +98,8 @@ class TravelSiteController extends Controller
     public function show($id)
     {
         $site = Site::findOrFail($id);
-        return view('dashboard.travel-show', compact('site'));
+        $sites = Site::orderBy('created_at', 'desc')->take(5)->get();
+        return view('dashboard.travel-show', compact('site', 'sites'));
     }
 
     /**
@@ -127,7 +128,32 @@ class TravelSiteController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|min:4',
+            'address' => 'required|min:4',
+            'description' => 'required|min:10',
+            'travel_type_id' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+        ], [
+            'name.required' => 'Masukkan nama tempat wisata',
+            'name.min' => 'Nama tempat wisata harus lebih dari atau sama dengan 4 karakter',
+            'address.required' => 'Masukkan alamat tempat wisata',
+            'address.min' => 'Alamat tempat wisata harus lebih dari atau sama dengan 4 karakter',
+            'description.required' => 'Masukkan deskripsi tempat wisata',
+            'description.min' => 'Deskripsi tempat wisata harus lebih dari atau sama dengan 4 karakter',
+            'travel_type_id.required' => 'Pilih tipe wisata',
+        ]);
+
+        return Site::where('id', $id)->update([
+            'name' => $request->name,
+            'slug' => str_slug(strtolower($request->name)),
+            'address' => $request->address,
+            'description' => $request->description,
+            'travel_type_id' => $request->travel_type_id,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude
+        ]);
     }
 
     /**
@@ -138,6 +164,6 @@ class TravelSiteController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return Site::destroy($id);
     }
 }

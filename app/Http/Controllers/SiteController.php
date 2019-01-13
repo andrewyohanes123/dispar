@@ -19,6 +19,7 @@ class SiteController extends Controller
     {
         $site = Site::where('site_type_id', 5)->where('slug', $slug)->first();
         $facility = \App\SiteType::whereNotIn('id', [5])->get();
-        return view('home.travel-show', compact('site', 'facility'));
+        $sites = Site::orderBy('id', 'desc')->whereNotIn('id', [$site->id])->take(5)->get();
+        return view('home.travel-show', compact('site', 'facility', 'sites'));
     }
 }

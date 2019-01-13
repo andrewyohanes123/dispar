@@ -27,6 +27,7 @@
     },
     "dependencies": {
         "google-maps-react": "^2.0.2",
-        "react-dropzone": "^8.0.3"
+        "react-dropzone": "^8.0.3",
+        "react-viewer": "^2.8.0"
     }
 }

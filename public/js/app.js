@@ -66966,6 +66966,7 @@ function (_Component) {
     _this.trackScreen = _this.trackScreen.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.onSearch = _this.onSearch.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.onSubmit = _this.onSubmit.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.loadMore = _this.loadMore.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
@@ -66975,8 +66976,7 @@ function (_Component) {
       this.setState({
         loading: true
       });
-      this.getSites();
-      document.addEventListener('scroll', this.trackScreen);
+      this.getSites(); // document.addEventListener('scroll', this.trackScreen);
     }
   }, {
     key: "trackScreen",
@@ -67002,9 +67002,29 @@ function (_Component) {
       }
     }
   }, {
+    key: "loadMore",
+    value: function loadMore(ev) {
+      var _this3 = this;
+
+      ev.preventDefault();
+      this.setState(function (_ref2) {
+        var page = _ref2.page,
+            last_page = _ref2.last_page;
+        page === last_page ? page = last_page : page++;
+        return {
+          page: page
+        };
+      }, function () {
+        var _this3$state = _this3.state,
+            page = _this3$state.page,
+            last_page = _this3$state.last_page;
+        if (page !== last_page + 1) _this3.getSites();
+      });
+    }
+  }, {
     key: "getSites",
     value: function getSites() {
-      var _this3 = this;
+      var _this4 = this;
 
       var _this$state = this.state,
           pageParams = _this$state.page,
@@ -67016,10 +67036,10 @@ function (_Component) {
           q: q
         }
       }).then(function (resp) {
-        return _this3.setState(function (_ref2) {
-          var sites = _ref2.sites,
-              last_page = _ref2.last_page,
-              page = _ref2.page;
+        return _this4.setState(function (_ref3) {
+          var sites = _ref3.sites,
+              last_page = _ref3.last_page,
+              page = _ref3.page;
           console.log(page === last_page ? 'last page' : "page ".concat(page));
           return {
             sites: [].concat(_toConsumableArray(sites), _toConsumableArray(resp.data.data)),
@@ -67032,7 +67052,7 @@ function (_Component) {
   }, {
     key: "deleteSite",
     value: function deleteSite(id) {
-      axios__WEBPACK_IMPORTED_MODULE_2___default.a.delete("".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/dashboard/travel-site/").concat(id)).then(function (resp) {
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.delete("".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/dashboard/tempat-wisata/").concat(id)).then(function (resp) {
         return console.log(resp);
       }).catch(function (err) {
         return console.log(err);
@@ -67056,6 +67076,8 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
+      var _this5 = this;
+
       var _this$state2 = this.state,
           sites = _this$state2.sites,
           loading = _this$state2.loading;
@@ -67127,6 +67149,11 @@ function (_Component) {
           className: "fa fa-edit fa-lg"
         })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
           href: "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_3__["default"], "/dashboard/tempat-wisata/").concat(site.id),
+          onClick: function onClick(ev) {
+            ev.preventDefault();
+
+            _this5.deleteSite(site.id);
+          },
           className: "btn btn-danger btn-sm",
           title: "Hapus ".concat(site.name, " ?")
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
@@ -67138,7 +67165,11 @@ function (_Component) {
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("i", {
           className: "fa fa-eye fa-lg"
         }))));
-      })));
+      })), this.state.page !== this.state.last_page + 1 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+        href: "#",
+        onClick: this.loadMore,
+        className: "d-block my-2 btn btn-outline-primary btn-block"
+      }, "Load More"));
     }
   }]);
 
@@ -67171,6 +67202,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _FormMap__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./FormMap */ "./resources/js/components/FormMap.js");
 /* harmony import */ var _UploadingModal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./UploadingModal */ "./resources/js/components/UploadingModal.js");
+/* harmony import */ var _BaseURL__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./BaseURL */ "./resources/js/components/BaseURL.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -67190,6 +67222,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
 
 
 
@@ -67227,6 +67260,7 @@ function (_Component) {
     _this.onFileSelect = _this.onFileSelect.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.postData = _this.postData.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     _this.getSite = _this.getSite.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.uploadPhoto = _this.uploadPhoto.bind(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
   }
 
@@ -67282,19 +67316,50 @@ function (_Component) {
   }, {
     key: "onFileSelected",
     value: function onFileSelected(ev) {
+      var _this4 = this;
+
+      // console.dir(ev.target.files[0]);
       this.setState({
-        photo: ev,
-        files: ev.map(function (file) {
-          return Object.assign(file, {
-            preview: URL.createObjectURL(file)
+        photo: ev.target.files[0]
+      }, function () {
+        return _this4.uploadPhoto();
+      });
+    }
+  }, {
+    key: "uploadPhoto",
+    value: function uploadPhoto() {
+      var _this5 = this;
+
+      // e.preventDefault();
+      var id = document.querySelector('meta[name="travel-id"]').content;
+      var FD = new FormData();
+      FD.append('photo', this.state.photo);
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.post("".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_5__["default"], "/dashboard/site-picture"), FD, {
+        onUploadProgress: function onUploadProgress(progress) {
+          return _this5.setState({
+            progress: Math.round(progress.loaded * 100 / progress.total)
           });
-        })
+        },
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        params: {
+          id: id
+        }
+      }).then(function (resp) {
+        var site_pictures = _this5.state.site_pictures;
+        site_pictures.push(resp.data);
+
+        _this5.setState({
+          site_pictures: site_pictures,
+          progress: 0
+        });
       });
     }
   }, {
     key: "onFileSelect",
     value: function onFileSelect(ev) {
-      var _this4 = this;
+      var _this6 = this;
 
       this.setState({
         photo: ev.target.files[0],
@@ -67302,14 +67367,15 @@ function (_Component) {
           preview: URL.createObjectURL(ev.target.files[0])
         })
       }, function () {
-        return console.log(_this4.state.files);
+        return console.log(_this6.state.files);
       });
     }
   }, {
     key: "postData",
     value: function postData(ev) {
-      var _this5 = this;
+      var _this7 = this;
 
+      ev.preventDefault();
       var _this$state = this.state,
           name = _this$state.name,
           address = _this$state.address,
@@ -67318,29 +67384,17 @@ function (_Component) {
           longitude = _this$state.longitude,
           latitude = _this$state.latitude,
           photo = _this$state.photo;
-      ev.preventDefault();
-      var FD = new FormData();
-      FD.append('photo', photo);
-      FD.append('name', name);
-      FD.append('address', address);
-      FD.append('description', description);
-      FD.append('travel_type_id', travel_type_id);
-      FD.append('longitude', longitude);
-      FD.append('latitude', latitude); // try {
+      var id = document.querySelector('meta[name="travel-id"]').content; // try {
 
-      axios__WEBPACK_IMPORTED_MODULE_2___default.a.post('/dashboard/tempat-wisata/', FD, {
-        onUploadProgress: function onUploadProgress(progress) {
-          return _this5.setState({
-            progress: Math.round(progress.loaded * 100 / progress.total)
-          });
-        },
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+      axios__WEBPACK_IMPORTED_MODULE_2___default.a.put("".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_5__["default"], "/dashboard/tempat-wisata/").concat(id), {
+        name: name,
+        address: address,
+        description: description,
+        travel_type_id: travel_type_id,
+        longitude: longitude,
+        latitude: latitude
       }).then(function (resp) {
-        _this5.uploadModal.openModal();
-
-        if (resp.data.site) _this5.setState({
+        if (resp.data.site) _this7.setState({
           name: '',
           address: '',
           description: '',
@@ -67348,10 +67402,10 @@ function (_Component) {
           files: [],
           photo: []
         }, function () {
-          return _this5.fileInput.value = '';
+          return _this7.file.value = '';
         });
       }).catch(function (error) {
-        return _this5.setState({
+        return _this7.setState({
           errors: error.response.data.errors
         });
       });
@@ -67359,7 +67413,7 @@ function (_Component) {
   }, {
     key: "render",
     value: function render() {
-      var _this6 = this;
+      var _this8 = this;
 
       var _this$state2 = this.state,
           name = _this$state2.name,
@@ -67369,41 +67423,6 @@ function (_Component) {
           errors = _this$state2.errors,
           latitude = _this$state2.latitude,
           longitude = _this$state2.longitude;
-      var baseStyle = {
-        width: '100%',
-        height: 'auto',
-        borderWidth: 0.5,
-        borderColor: '#666',
-        borderStyle: 'solid',
-        borderRadius: 5,
-        padding: 10,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        cursor: 'pointer'
-      };
-      var thumb = {
-        display: 'inline-flex',
-        borderRadius: 2,
-        border: '1px solid #eaeaea',
-        marginBottom: 8,
-        marginRight: 8,
-        width: 300,
-        height: 300,
-        padding: 4,
-        boxSizing: 'border-box'
-      };
-      var thumbInner = {
-        display: 'flex',
-        minWidth: 0,
-        overflow: 'hidden'
-      };
-      var img = {
-        display: 'inline',
-        width: 'auto',
-        height: '100%'
-      };
       return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "row"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
@@ -67474,25 +67493,20 @@ function (_Component) {
         return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
           className: "invalid-feedback"
         }, error);
-      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("label", {
-        htmlFor: "",
-        className: "control-label mb-1 mt-1"
-      }, "Gambar tempat wisata"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
-        type: "file",
-        name: "photo",
-        id: "",
-        onChange: this.onFileSelect,
-        key: function key(ref) {
-          return _this6.fileInput = ref;
-        },
-        multiple: false,
-        accept: ['image/jpg', 'image/jpeg', 'image/png'],
-        className: "form-control"
-      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+      }) : '', react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
         type: "submit",
         onClick: this.postData,
         className: "btn btn-outline-success btn-sm"
-      }, "Buat"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+      }, "Buat")), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+        accept: ['image/jpg', 'image/png', 'image/jpeg'],
+        type: "file",
+        name: "photo",
+        ref: function ref(_ref) {
+          return _this8.file = _ref;
+        },
+        className: "d-none",
+        onChange: this.onFileSelected
+      })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "col-md-6"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_FormMap__WEBPACK_IMPORTED_MODULE_3__["default"], {
         position: {
@@ -67500,28 +67514,44 @@ function (_Component) {
           lng: longitude
         },
         address: function address(_address) {
-          return _this6.setState({
+          return _this8.setState({
             address: _address
           });
         },
-        onCoordChange: function onCoordChange(_ref) {
-          var latitude = _ref.latitude,
-              longitude = _ref.longitude;
-          return _this6.setState({
+        onCoordChange: function onCoordChange(_ref2) {
+          var latitude = _ref2.latitude,
+              longitude = _ref2.longitude;
+          return _this8.setState({
             latitude: latitude,
             longitude: longitude
           });
         }
-      }), this.state.files.length !== 0 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
-        src: this.state.files.preview,
-        alt: "",
-        className: "img-fluid img-thumbnail my-2"
-      }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_UploadingModal__WEBPACK_IMPORTED_MODULE_4__["default"], {
-        ref: function ref(_ref2) {
-          return _this6.uploadModal = _ref2;
+      }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
+        onClick: function onClick() {
+          return _this8.file.click();
         },
-        progress: this.state.progress
-      }));
+        className: "btn btn-outline-success btn-block my-2"
+      }, "Tambah Gambar"), this.state.progress > 0 && react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react__WEBPACK_IMPORTED_MODULE_0__["Fragment"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+        className: "small text-center text-muted"
+      }, "Mengupload"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "progress"
+      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        style: {
+          width: "".concat(this.state.progress, "%")
+        },
+        className: "progress-bar progress-bar-striped progress-bar-animated"
+      }, this.state.progress, "%"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("hr", null)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+        className: "container"
+      }, this.state.site_pictures.map(function (pic, i) {
+        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+          key: i,
+          className: "preview shadow-sm"
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("img", {
+          src: "".concat(_BaseURL__WEBPACK_IMPORTED_MODULE_5__["default"], "/storage/img/").concat(pic.photo),
+          alt: "",
+          className: "img-fluid"
+        }));
+      }))));
     }
   }]);
 

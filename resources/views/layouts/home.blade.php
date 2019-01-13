@@ -27,7 +27,7 @@
                 </li>
                 <li class="nav-item {{ (Route::current()->getName() === 'root.news') ? 'active' : '' }}"><a href="{{ route('root.news') }}" class="nav-link">Berita</a></li>
                 <li class="nav-item {{ (Route::current()->getName() === 'root.sites') ? 'active' : '' }}"><a href="{{ route('root.sites') }}" class="nav-link">Tempat Wisata</a></li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown {{ (Route::current()->getName() === 'root.facilities') ? 'active' : '' }}">
                     <a href="#" id="dropdown" class="nav-link dropdown-toggle" data-toggle="dropdown">Fasilitas</a>
                     <div class="dropdown-menu">
                         @foreach ($facility as $item)
@@ -60,6 +60,15 @@
         </div>
     {{-- </div> --}}
     <script src="{{ mix('js/app.js') }}"></script>
+    <script>
+        $(document).ready(function(){
+            $('.anim').each(function(i, e) {
+            $(e).css({'animation' : 'news-animation ' + (750+i) + 'ms forwards', 'animation-delay' : (1000 + (i*100)) + 'ms'})
+            console.log(750+i, 500+ (10/i));
+            })
+            // console.log('rede')
+        })
+    </script>
     @yield('script')
 </body>
 </html>
