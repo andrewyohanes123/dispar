@@ -18,6 +18,9 @@
 //   border-radius: 0.25em;
 //   font-size: 20px !important;
 // }
+// html {
+//   height: 100%;
+// }
 
 body {
   position: relative;
@@ -74,12 +77,21 @@ textarea {
   left : 0;
 }
 
+.card-img-left {
+  border-top-left-radius: 0.25rem !important;
+  border-bottom-left-radius: 0.25rem !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
 .banner {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
+  transition: 0.5s ease-in-out;
+  animation: banner-position 750ms linear;
   p {
     font-family: 'Open Sans', sans-serif;
     font-size: 50px;
@@ -121,6 +133,17 @@ textarea {
     text-shadow: 0px 2px 15px rgba(0, 0, 0, 0.9), 0px 0px 20px black, 0px 0px 25px black;
     cursor: pointer;
   }
+  div.shadow {
+    background : linear-gradient(to right, transparent,rgba(255, 255, 255, 0.15), transparent);
+    position : absolute;
+    top : 0;
+    left : 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    transform: translateX(-100%);
+    animation: shadow 750ms linear;
+  }
 }
 
 .preview {
@@ -158,6 +181,15 @@ textarea {
   }
 }
 
+@keyframes shadow {
+  0% {
+    transform : translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @keyframes slide {
   0% {
     transform: translateY(-5%);
@@ -167,6 +199,18 @@ textarea {
   }
   100% {
     transform: translateY(0);
+  }
+}
+
+@keyframes banner-position {
+  0% {
+    background-position: top !important;
+  }
+  50% {
+    background-position: center !important;
+  }
+  100% {
+    background-position: bottom !important;
   }
 }
 
@@ -199,6 +243,9 @@ textarea {
   .footer {
     text-align: center;
     .row {
+      div.col-md-4:nth-child(1) {
+        text-align: left;
+      }
       div.col-md-4:nth-child(3) {
         text-align: right;
       }

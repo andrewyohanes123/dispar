@@ -27,7 +27,9 @@ class FacilityController extends Controller
         $this->nama = $name;
         $this->nama = explode('-', $this->nama);
         $this->nama = implode(' ', $this->nama);
-        $site = Site::where('slug', $slug)->get()->first();
+        $site = Site::where('slug', $slug)->whereHas('site_type', function($q) {
+            $q->where('name', $this->nama);
+        })->get()->first();
         $facility = \App\SiteType::whereNotIn('id', [5])->get();
         $sites = Site::whereNotIn('site_type_id', [5])->whereNotIn('id', [$site->id])->whereHas('site_type', function($q){
             $q->where('name', $this->nama);

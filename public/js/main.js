@@ -17,6 +17,11 @@ $(document).ready(function () {
     $(this).addClass('d-none');
   });
 
+  $('input[name="date"]').flatpickr({
+    format : 'Y-m-d',
+    mode : 'range'
+  });
+
   $('.hapus-berita').click(function(ev){
     ev.preventDefault();
     $(this).siblings('form').submit();

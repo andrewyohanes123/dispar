@@ -23,9 +23,12 @@ Route::get('/berita/{year}/{month}/{slug}', 'RootController@show_news')->name('r
 Route::get('/tempat-wisata', 'SiteController@index')->name('root.sites');
 Route::get('/tempat-wisata/{slug}', 'SiteController@show')->name('root.site-show');
 Route::get('/gallery', 'GalleryController@index')->name('root.galleries');
+Route::get('/gallery-api', 'GalleryController@api');
 Route::get('/fasilitas/{nama}', 'FacilityController@index')->name('root.facilities');
 Route::get('/fasilitas/{nama}/{slug}', 'FacilityController@show')->name('root.facilities-show');
-Route::geT('/visi-misi', 'PointsController@index')->name('root.point');
+Route::get('/visi-misi', 'PointsController@index')->name('root.point');
+Route::get('/event', 'EventCalendarController@home')->name('root.events');
+Route::get('event-api', 'EventCalendarController@api');
 
 Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
   Route::get('/main', function () {
@@ -45,6 +48,7 @@ Route::group(['prefix' => 'dashboard', 'middleware' => ['auth']], function () {
   Route::get('/tempat-wisata/{id}/api', 'TravelSiteController@api');
   Route::resource('fasilitas-wisata', 'FacilitiesController');
   Route::resource('kalender-kegiatan', 'EventCalendarController');
+  Route::get('event-api', 'EventCalendarController@api');
   Route::redirect('/', '/dashboard/main', 301);
   Route::get('/travel-site', 'SiteControllerAPI@index');
 });

@@ -6,13 +6,13 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="base-url" content="{{ url('/') }}">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  @yield('meta')
   <title>@yield('title') | {{ config('app.name', 'Dashboard - Dinas Pariwisata Kota Manado') }}</title>  
   <link href="{{ mix('css/app.css') }}" rel="stylesheet">
   <link href="{{ asset('css/dark.css') }}" rel="stylesheet">
   <link href="{{ asset('css/dashboard.css') }}" rel="stylesheet">
   <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ asset('css/summernote-bs4.css') }}" rel="stylesheet">
+  @yield('meta')
 </head>
 <body>
   <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
@@ -32,7 +32,7 @@
             <li class="nav-item"><a href="{{ route('berita.index') }}" class="nav-link {{ (Route::current()->getName() === 'berita.index') ? 'active' : '' }}"><i class="fa fa-newspaper-o fa-md"></i>&nbsp;Berita</a></li>
             <li class="nav-item"><a href="{{ route('tempat-wisata.index') }}" class="nav-link {{ (Route::current()->getName() === 'tempat-wisata.index') ? 'active' : '' }}"><i class="fa fa-map-marker fa-md"></i>&nbsp;Tempat Wisata</a></li>
             <li class="nav-item"><a href="{{ route('fasilitas-wisata.index') }}" class="nav-link {{ (Route::current()->getName() === 'fasilitas-wisata.index') ? 'active' : '' }}"><i class="fa fa-building-o fa-md"></i>&nbsp;Fasilitas Wisata</a></li>
-            <li class="nav-item"><a href="{{ route('kalender-kegiatan.index') }}" class="nav-link {{ (Route::current()->getName() === 'kalender-kegiatan.index') ? 'active' : '' }}"><i class="fa fa-calendar fa-md"></i>&nbsp;Kalender Kegiatan</a></li>
+            <li class="nav-item"><a href="{{ route('kalender-kegiatan.index') }}" class="nav-link {{ (Route::current()->getName() === 'kalender-kegiatan.index') ? 'active' : '' }}"><i class="fa fa-calendar fa-md"></i>&nbsp;Event</a></li>
           </ul>
           <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
             <a id="logout-btn" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" href="#"><i class="fa fa-sign-out fa-md text-muted"></i>&nbsp;Logout</a>
@@ -51,10 +51,10 @@
       </div>
     </div>
   </div>
-  <script src="{{ mix('js/app.js') }}" defer></script>    
+  <script src="{{ mix('js/app.js') }}"></script>    
   <script src="{{ asset('js/flatpickr') }}"></script>  
-  <script src="{{ asset('js/summernote-bs4.js') }}" defer></script>    
-  <script src="{{ asset('js/main.js') }}" defer></script>    
+  <script src="{{ asset('js/summernote-bs4.js') }}"></script>    
+  <script src="{{ asset('js/main.js') }}"></script>    
   @yield('scripts')
 </body>
 </html>

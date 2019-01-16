@@ -16,6 +16,7 @@
 @section('banner')
     <div id="banner" class="vh-100 w-100 o-hidden">
         <div class="banner w-100 vh-100" style="background-image: url(https://jacksonmahino.files.wordpress.com/2015/08/img20150715042224.jpg); background-size:cover;background-position:bottom;">
+            {{-- <div class="shadow"></div> --}}
             <p class="m-0">Dinas <span>Pariwisata</span></p>
             <h4 class="m-0">Kota Manado</h4>
             {{-- <img src="https://jacksonmahino.files.wordpress.com/2015/08/img20150715042224.jpg" class="w-100" alt=""> --}}

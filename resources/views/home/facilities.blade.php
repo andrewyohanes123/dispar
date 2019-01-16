@@ -13,15 +13,16 @@
     <hr>
     <div class="card-columns">
         @foreach ($facilities as $site)  
-        <div class="card">
+        <div class="card border-0 shadow-sm">
           <a href="{{ route('root.facilities-show', ['slug' => $site->slug, 'name' => str_slug(strtolower($site->site_type->name))]) }}"><img src="{{ asset('storage/img/' . $site->site_pictures->first()->photo) }}" alt="" class="card-img-top"></a>
           <div class="card-body">
-            <h4 class="m-0">{{ $site->name }}</h4>
+              <a href="{{ route('root.facilities-show', ['slug' => $site->slug, 'name' => str_slug(strtolower($site->site_type->name))]) }}"><h4 class="m-0">{{ $site->name }}</h4></a>
             <p class="small text-muted">{{ $site->site_type->name }}</p>
             <p class="m-0">{{ $site->description }}</p>
           </div>
         </div>
         @endforeach
     </div>
+    <hr>
     {!! $facilities->appends(request()->q)->links() !!}
 @endsection

@@ -15,9 +15,14 @@ class GalleryController extends Controller
      */
     public function index()
     {
-        $picts = SitePicture::orderBy('id', 'ASC')->paginate(9);
+        // $picts = SitePicture::orderBy('id', 'ASC')->paginate(9);
         $facility = \App\SiteType::whereNotIn('id', [5])->get();
-        return view('home.galleries', compact('picts', 'facility'));
+        return view('home.galleries', compact('facility'));
+    }
+
+    public function api()
+    {
+        return SitePicture::with(['site.travel_type', 'site.site_type'])->paginate(9);
     }
 
     /**

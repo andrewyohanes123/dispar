@@ -2,6 +2,7 @@
 @section('title', $site->name)
 
 @section('content')
+    {{-- {{ dd($site->facilities) }} --}}
     <div class="d-flex flex-row justify-content-between align-items-center mb-3">
       @if ($site->travel_type !== null)
         <a href="{{ route('root.sites') }}" class="btn btn-primary btn-sm"><i class="fa fa-chevron-left fa-sm"></i>&nbsp;Kembali</a>
@@ -27,7 +28,7 @@
               </div>
               <input type="text" readonly value="{{ $site->address }}" class="form-control">
             </div> --}}
-            @if ($site->facilities !== null)
+            @if ($site->facilities->count() > 0)
               <p class="m-0">Fasilitas :</p>
               <ul class="mb-0">
                 @foreach ($site->facilities as $item)

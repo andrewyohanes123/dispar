@@ -36,6 +36,7 @@
                     </div>
                 </li>
                 <li class="nav-item {{ (Route::current()->getName() === 'root.galleries') ? 'active' : '' }}"><a href="{{ route('root.galleries') }}" class="nav-link">Gallery</a></li>
+                <li class="nav-item {{ (Route::current()->getName() === 'root.events') ? 'active' : '' }}"><a href="{{ route('root.events') }}" class="nav-link">Event</a></li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 @auth
